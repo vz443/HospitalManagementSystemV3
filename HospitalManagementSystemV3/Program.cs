@@ -10,4 +10,7 @@ foreach (var doctor in doctors)
 }
 
 Login login = new Login(context);
-
+if (login.IsLoggedIn)
+{
+    
+}

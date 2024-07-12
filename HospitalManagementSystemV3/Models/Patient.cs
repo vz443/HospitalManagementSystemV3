@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HospitalManagementSystemV3.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace HospitalManagementSystemV3.Models
 {
-    internal class Patient
+    internal class Patient : IUser
     {
-        public Guid? Id { get; set; }
+        public required Guid Id { get; set; }
         public required string Name { get; set; }
         public required string Email  { get; set; }
         public required string Phone {  get; set; }
