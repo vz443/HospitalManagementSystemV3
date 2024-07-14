@@ -7,13 +7,13 @@ using System.Security;
 
 namespace HospitalManagementSystemV3.App
 {
-    class Login : PrintText, IMenuDisplay
+    class Login : PrintText, IMenu
     {
         public Login(AppDbContext context)
         {
             _context = context;
-            PrintHeader("timothy  is cooooool");
-            PrintBody();
+            PrintHeader("Login");
+            DisplayMainMenu();
         }
         
         public bool IsLoggedIn { get; private set; }
@@ -27,7 +27,7 @@ namespace HospitalManagementSystemV3.App
             base.PrintHeader(title);
         }
 
-        public void PrintBody()
+        public void DisplayMainMenu()
         {
             Console.Write("ID: ");
             var username = Console.ReadLine();
@@ -39,10 +39,10 @@ namespace HospitalManagementSystemV3.App
                 password = GetPassword();
                 if (!ValidateLogin(username, password))
                 {
-                    Console.WriteLine("WRITE TEXT FOR WRONG PASSWORD");
+                    Console.WriteLine("Invalid Credentials");
                 }    
             }
-            Console.WriteLine("work");
+            Console.WriteLine("Valid Credentials");
 
             IsLoggedIn = true;
         }

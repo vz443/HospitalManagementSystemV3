@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace HospitalManagementSystemV3.Interface
 {
-    public interface IMenuDisplay
+    public interface IMenu
     {
         public void PrintHeader(string title);
 
-        public void PrintBody();
+        public void DisplayMainMenu();
     }
 }

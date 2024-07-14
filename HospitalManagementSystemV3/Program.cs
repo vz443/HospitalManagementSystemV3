@@ -1,5 +1,7 @@
 ﻿using HospitalManagementSystemV3.App;
 using HospitalManagementSystemV3.Database;
+using HospitalManagementSystemV3.Models;
+using System.Text;
 
 var context = new AppDbContext();
 
@@ -10,7 +12,11 @@ foreach (var doctor in doctors)
 }
 
 Login login = new Login(context);
+
 if (login.IsLoggedIn)
 {
-    
+    if (login.LoggedInUser.GetType() == typeof(Doctor))
+    {
+        DoctorMenu doctor = new(context, login.LoggedInUser);
+    }
 }
