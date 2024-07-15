@@ -21,24 +21,24 @@ namespace HospitalManagementSystemV3.App
 
             _context = context;
 
-            Doctor = loggedInUser;
+            currentDoctor = loggedInUser;
 
             Startup();
         }
 
         AppDbContext _context;
 
-        IUser Doctor;
+        IUser currentDoctor;
 
         void Startup()
         {
-            base.PrintHeader("Doctor Menu");
-
             DisplayMainMenu();
         }
 
         public void DisplayMainMenu()
         {
+            Console.Clear();
+            base.PrintHeader("Doctor Menu");
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -84,22 +84,22 @@ namespace HospitalManagementSystemV3.App
                     ListDoctorDetails();
                     break;
                 case 2:
-                    //ListPatients();
+                    ListPatients();
                     break;
                 case 3:
-                    //ListAppointments();
+                    ListAppointmentsWithPatient();
                     break;
                 case 4:
-                    //CheckParticularPatient();
+                    CheckParticularPatient();
                     break;
                 case 5:
-                    //ListAppointmentsWithPatient();
+                    ListAppointmentsWithPatient();
                     break;
                 case 6:
-                    //Logout();
+                    Logout();
                     break;
                 case 7:
-                    //Exit();
+                    Environment.Exit(0);
                     break;
             }    
         }
@@ -109,7 +109,88 @@ namespace HospitalManagementSystemV3.App
             Console.Clear();
             base.PrintHeader("My Details");
             Console.WriteLine("Name            | Email Address   | Phone        | Address");
-            Console.WriteLine($"{Doctor.Name,-16}| {Doctor.Email,-18}| {Doctor.Phone,-14}| {Doctor.Address}"); //make this line up 
+            Console.WriteLine($"{currentDoctor.Name,-16}| {currentDoctor.Email,-18}| {currentDoctor.Phone,-14}| {currentDoctor.Address}"); //make this line up 
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void ListPatients()
+        {
+            Console.Clear();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine($"Patients assigned to {currentDoctor.Name}: ");
+            Console.WriteLine();
+
+            Console.WriteLine("Patient            | Doctor   | Email Address        | Phone     | Address");
+            foreach (var patient in ((Doctor)currentDoctor).Patients)
+            {
+                Console.WriteLine($"{patient.Name,-16}| {currentDoctor.Name,-18}| {patient.Email,-14}| {patient.Phone}|  {patient.Address}"); //make this line up 
+            }
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void CheckParticularPatient()
+        {
+            Console.Clear();
+            base.PrintHeader("Check Patient Details");
+            Console.WriteLine();
+
+            Console.Write("Enter the ID of the patient to check: ");
+            var ID = Console.ReadLine();
+            var patients = _context.Patients;
+
+            foreach (var patient in patients)
+            {
+                if (patient.Username == ID)
+                {
+                    Console.WriteLine("Patient            | Doctor   | Email Address        | Phone     | Address");
+                    Console.WriteLine($"{patient.Name,-16}| {currentDoctor.Name,-18}| {patient.Email,-14}| {patient.Phone}|  {patient.Address}"); //make this line up and create method to do this in the print class
+                }
+            }
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void ListAppointmentsWithPatient()
+        {
+            Console.Clear();
+            base.PrintHeader("Appointments With");
+            Console.WriteLine();
+
+            Console.Write("Enter the ID of the patient you would like to view the appointments for: ");
+            var patientID = Console.ReadLine();
+
+            var patient = _context.Patients.FirstOrDefault(x => x.Username == patientID);
+
+            if (patient != null)
+            {
+                foreach (var appointment in patient.Appointments)
+                {
+                    Console.WriteLine("Write the top line here");
+                    Console.WriteLine($"{appointment.Doctor.Name}       | {appointment.Patient.Name}        | {appointment.Description}");
+                }
+            }
+            else
+            {
+                // error check here 
+            }
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void Logout()
+        {
+            //call base logout
         }
     }
 }

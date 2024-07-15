@@ -1,10 +1,10 @@
 ﻿using HospitalManagementSystemV3.App;
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 var context = new AppDbContext();
-
 var doctors = context.Doctors.ToList();
 foreach (var doctor in doctors)
 {

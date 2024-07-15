@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HospitalManagementSystemV3.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HospitalManagementSystemV3.Models
+internal class Appointment
 {
-    internal class Appointment
-    {
-        [Key]
-        public int Id { get; set; }
-
-        public required Doctor Doctor { get; set; }
-        public required Patient Patient { get; set; }
-        public required string Description { get; set; }
-
-    }
+    [Key]
+    public int Id { get; set; }
+    public required Guid DoctorId { get; set; }
+    public required Guid PatientId { get; set; }
+    public required string Description { get; set; }
+    public Doctor? Doctor { get; set; }
+    public Patient? Patient { get; set; }
 }
