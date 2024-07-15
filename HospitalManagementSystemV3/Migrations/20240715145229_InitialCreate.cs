@@ -41,7 +41,7 @@ namespace HospitalManagementSystemV3.Migrations
                     Address = table.Column<string>(type: "TEXT", nullable: false),
                     Username = table.Column<string>(type: "TEXT", nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: false),
-                    DoctorId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    DoctorId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,7 +50,8 @@ namespace HospitalManagementSystemV3.Migrations
                         name: "FK_Patients_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,8 +86,8 @@ namespace HospitalManagementSystemV3.Migrations
                 columns: new[] { "Id", "Address", "Email", "Name", "Password", "Phone", "Username" },
                 values: new object[,]
                 {
-                    { new Guid("9f57f93c-22fb-413a-8206-e814efc81c8d"), "456 Oak St, Anytown, USA", "jane.smith@example.com", "Dr. Jane Smith", "password123", "098-765-4321", "jane_smith" },
-                    { new Guid("ba1d5a8b-063f-473e-b9c0-524b89b3f825"), "123 Main St, Anytown, USA", "john.doe@example.com", "Dr. John Doe", "password123", "123-456-7890", "john_doe" }
+                    { new Guid("383bf44b-f74e-4b21-be15-339866d29628"), "123 Main St, Anytown, USA", "john.doe@example.com", "Dr. John Doe", "password123", "123-456-7890", "john_doe" },
+                    { new Guid("946b8c60-77fa-49d9-8aed-b42817ca2113"), "456 Oak St, Anytown, USA", "jane.smith@example.com", "Dr. Jane Smith", "password123", "098-765-4321", "jane_smith" }
                 });
 
             migrationBuilder.InsertData(
@@ -94,9 +95,9 @@ namespace HospitalManagementSystemV3.Migrations
                 columns: new[] { "Id", "Address", "DoctorId", "Email", "Name", "Password", "Phone", "Username" },
                 values: new object[,]
                 {
-                    { new Guid("224678c3-2865-4dc0-876c-670df6a74d22"), "321 Elm St, Anytown, USA", null, "patient.two@example.com", "Patient Two", "password123", "444-555-6666", "patient_two" },
-                    { new Guid("caefec1f-667b-458c-87b5-adeae3ee760c"), "789 Pine St, Anytown, USA", null, "patient.one@example.com", "Patient One", "password123", "111-222-3333", "patient_one" },
-                    { new Guid("fa700bb3-ff4a-407f-be1f-dbe45c6ae509"), "654 Birch St, Anytown, USA", null, "patient.three@example.com", "Patient Three", "password123", "777-888-9999", "patient_three" }
+                    { new Guid("08742018-7f29-403d-bbc7-8fc5c095df25"), "789 Pine St, Anytown, USA", new Guid("383bf44b-f74e-4b21-be15-339866d29628"), "patient.one@example.com", "Patient One", "password123", "111-222-3333", "patient_one" },
+                    { new Guid("a7fcb488-3a02-4b3e-a9c2-dc4793ce3bda"), "321 Elm St, Anytown, USA", new Guid("383bf44b-f74e-4b21-be15-339866d29628"), "patient.two@example.com", "Patient Two", "password123", "444-555-6666", "patient_two" },
+                    { new Guid("ab17abe4-be1d-4d9c-9050-b01b29c303d8"), "654 Birch St, Anytown, USA", new Guid("946b8c60-77fa-49d9-8aed-b42817ca2113"), "patient.three@example.com", "Patient Three", "password123", "777-888-9999", "patient_three" }
                 });
 
             migrationBuilder.InsertData(
@@ -104,9 +105,9 @@ namespace HospitalManagementSystemV3.Migrations
                 columns: new[] { "Id", "Description", "DoctorId", "PatientId" },
                 values: new object[,]
                 {
-                    { 1, "General Checkup", new Guid("ba1d5a8b-063f-473e-b9c0-524b89b3f825"), new Guid("caefec1f-667b-458c-87b5-adeae3ee760c") },
-                    { 2, "Follow-up Visit", new Guid("ba1d5a8b-063f-473e-b9c0-524b89b3f825"), new Guid("224678c3-2865-4dc0-876c-670df6a74d22") },
-                    { 3, "Consultation", new Guid("9f57f93c-22fb-413a-8206-e814efc81c8d"), new Guid("fa700bb3-ff4a-407f-be1f-dbe45c6ae509") }
+                    { 1, "General Checkup", new Guid("383bf44b-f74e-4b21-be15-339866d29628"), new Guid("08742018-7f29-403d-bbc7-8fc5c095df25") },
+                    { 2, "Follow-up Visit", new Guid("383bf44b-f74e-4b21-be15-339866d29628"), new Guid("a7fcb488-3a02-4b3e-a9c2-dc4793ce3bda") },
+                    { 3, "Consultation", new Guid("946b8c60-77fa-49d9-8aed-b42817ca2113"), new Guid("ab17abe4-be1d-4d9c-9050-b01b29c303d8") }
                 });
 
             migrationBuilder.CreateIndex(

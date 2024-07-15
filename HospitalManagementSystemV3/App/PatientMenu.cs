@@ -1,6 +1,7 @@
 ﻿using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Interface;
+using HospitalManagementSystemV3.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -85,7 +86,7 @@ namespace HospitalManagementSystemV3.App
                     BookAppointments();
                     break;
                 case 5:
-                    ExitToLogin();
+                    //ExitToLogin();
                     break;
                 case 6:
                     Environment.Exit(0);
@@ -100,6 +101,64 @@ namespace HospitalManagementSystemV3.App
             Console.WriteLine();
             Console.WriteLine($"{currentPatient.Name}'s Details");
             Console.WriteLine($"Patient ID: {currentPatient.Username}");
+            Console.WriteLine($"Full Name: {currentPatient.Name}");
+            Console.WriteLine($"Address: {currentPatient.Address}");
+            Console.WriteLine($"Email: {currentPatient.Email}");
+            Console.WriteLine($"Phone: {currentPatient.Phone}");
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void ListDoctorDetails()
+        {
+            Console.Clear();
+            base.PrintHeader("My Doctor");
+            Console.WriteLine();
+            Console.WriteLine("Your doctor: ");
+            Console.WriteLine();
+
+            var doctor = ((Patient)currentPatient).Doctor;
+
+            Console.WriteLine("Name            | Email Address   | Phone        | Address     ");
+            Console.WriteLine($"{doctor.Name,-16}| {doctor.Email,-18}| {doctor.Phone,-14}| {doctor.Address}");
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void ListAllAppointments()
+        {
+            Console.Clear();
+            base.PrintHeader("My Appointments");
+            Console.WriteLine();
+
+            Console.WriteLine($"Appointments for {currentPatient.Name}");
+
+
+            if (currentPatient != null)
+            {
+                foreach (var appointment in currentPatient.Appointments)
+                {
+                    Console.WriteLine("Write the top line here");
+                    Console.WriteLine($"{appointment.Doctor.Name}       | {appointment.Patient.Name}        | {appointment.Description}");
+                }
+            }
+            else
+            {
+                // error check here 
+            }
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+        public void BookAppointments()
+        {
+
         }
     }
 }

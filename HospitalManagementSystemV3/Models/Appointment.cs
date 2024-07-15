@@ -1,7 +1,7 @@
 ﻿using HospitalManagementSystemV3.Models;
 using System.ComponentModel.DataAnnotations;
 
-internal class Appointment
+public class Appointment
 {
     [Key]
     public int Id { get; set; }

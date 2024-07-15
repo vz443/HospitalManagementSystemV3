@@ -2,7 +2,7 @@
 using HospitalManagementSystemV3.Models;
 using System.ComponentModel.DataAnnotations;
 
-internal class Doctor : IUser
+public class Doctor : IUser
 {
     [Key]
     public required Guid Id { get; set; }

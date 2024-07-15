@@ -34,7 +34,6 @@ namespace HospitalManagementSystemV3.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Seed data
             var doctorId1 = Guid.NewGuid();
             var doctorId2 = Guid.NewGuid();
             var patientId1 = Guid.NewGuid();
@@ -73,7 +72,8 @@ namespace HospitalManagementSystemV3.Database
                     Phone = "111-222-3333",
                     Address = "789 Pine St, Anytown, USA",
                     Username = "patient_one",
-                    Password = "password123"
+                    Password = "password123",
+                    DoctorId = doctorId1
                 },
                 new Patient
                 {
@@ -83,7 +83,8 @@ namespace HospitalManagementSystemV3.Database
                     Phone = "444-555-6666",
                     Address = "321 Elm St, Anytown, USA",
                     Username = "patient_two",
-                    Password = "password123"
+                    Password = "password123",
+                    DoctorId = doctorId1 
                 },
                 new Patient
                 {
@@ -93,7 +94,8 @@ namespace HospitalManagementSystemV3.Database
                     Phone = "777-888-9999",
                     Address = "654 Birch St, Anytown, USA",
                     Username = "patient_three",
-                    Password = "password123"
+                    Password = "password123",
+                    DoctorId = doctorId2 
                 }
             );
 
@@ -121,6 +123,7 @@ namespace HospitalManagementSystemV3.Database
                 }
             );
         }
+
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
