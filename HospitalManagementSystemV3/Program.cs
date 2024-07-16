@@ -18,4 +18,8 @@ if (login.IsLoggedIn)
     {
         PatientMenu patient = new(context, login.LoggedInUser);
     }
+    else if (login.LoggedInUser.GetType() == typeof(Admin))
+    {
+        AdminMenu admin = new(context, login.LoggedInUser);
+    }
 }

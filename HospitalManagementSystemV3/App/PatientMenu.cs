@@ -158,7 +158,18 @@ namespace HospitalManagementSystemV3.App
 
         public void BookAppointments()
         {
+            Console.Clear();
+            base.PrintHeader("Book Appointment");
+            
+            if (((Patient)currentPatient).Doctor == null)
+            {
+                Console.WriteLine("You are not registered with any doctor! Please choose which doctor you would like to register with");
 
+                foreach (var doctor in _context.Doctors)
+                {
+                    Console.WriteLine(""); //finish the rest 
+                }
+            }
         }
     }
 }
