@@ -4,7 +4,7 @@ using Microsoft.Identity.Client;
 
 namespace HospitalManagementSystemV3.Database
 {
-    class AppDbContext : DbContext
+    public class AppDbContext : DbContext
     {
         public AppDbContext()
         {
@@ -127,5 +127,6 @@ namespace HospitalManagementSystemV3.Database
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Admin> Admins { get; set; }
     }
 }

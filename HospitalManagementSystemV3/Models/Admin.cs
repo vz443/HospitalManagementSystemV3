@@ -1,10 +1,5 @@
-﻿using HospitalManagementSystemV3.Interface;
-using System;
-using System.Collections.Generic;
+﻿using HospitalManagementSystemV3.App.Interface;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HospitalManagementSystemV3.Models
 {

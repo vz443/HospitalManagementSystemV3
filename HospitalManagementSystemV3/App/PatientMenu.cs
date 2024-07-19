@@ -1,13 +1,13 @@
-﻿using HospitalManagementSystemV3.App.Print;
+﻿using HospitalManagementSystemV3.App.Interface;
+using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Interface;
 using HospitalManagementSystemV3.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace HospitalManagementSystemV3.App
 {
-    internal class PatientMenu : PrintText, IMenu
+    internal class PatientMenu : IMenu
     {
         public PatientMenu(AppDbContext context, IUser loggedInUser)
         {
@@ -32,7 +32,7 @@ namespace HospitalManagementSystemV3.App
         public void DisplayMainMenu()
         {
             Console.Clear();
-            base.PrintHeader("Patient Menu");
+            PrintText.PrintHeader("Patient Menu");
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -97,7 +97,7 @@ namespace HospitalManagementSystemV3.App
         public void ListPatientDetails()
         {
             Console.Clear();
-            base.PrintHeader("My Details");
+            PrintText.PrintHeader("My Details");
             Console.WriteLine();
             Console.WriteLine($"{currentPatient.Name}'s Details");
             Console.WriteLine($"Patient ID: {currentPatient.Username}");
@@ -114,15 +114,14 @@ namespace HospitalManagementSystemV3.App
         public void ListDoctorDetails()
         {
             Console.Clear();
-            base.PrintHeader("My Doctor");
+            PrintText.PrintHeader("My Doctor");
             Console.WriteLine();
             Console.WriteLine("Your doctor: ");
             Console.WriteLine();
 
             var doctor = ((Patient)currentPatient).Doctor;
 
-            Console.WriteLine("Name            | Email Address   | Phone        | Address     ");
-            Console.WriteLine($"{doctor.Name,-16}| {doctor.Email,-18}| {doctor.Phone,-14}| {doctor.Address}");
+            PrintText.PrintSingleDoctor(doctor);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
@@ -132,7 +131,7 @@ namespace HospitalManagementSystemV3.App
         public void ListAllAppointments()
         {
             Console.Clear();
-            base.PrintHeader("My Appointments");
+            PrintText.PrintHeader("My Appointments");
             Console.WriteLine();
 
             Console.WriteLine($"Appointments for {currentPatient.Name}");
@@ -140,7 +139,7 @@ namespace HospitalManagementSystemV3.App
 
             if (currentPatient != null)
             {
-                foreach (var appointment in currentPatient.Appointments)
+                foreach (var appointment in ((Patient)currentPatient).Appointments)
                 {
                     Console.WriteLine("Write the top line here");
                     Console.WriteLine($"{appointment.Doctor.Name}       | {appointment.Patient.Name}        | {appointment.Description}");
@@ -159,18 +158,32 @@ namespace HospitalManagementSystemV3.App
         public void BookAppointments()
         {
             Console.Clear();
-            base.PrintHeader("Book Appointment");
-            
+            PrintText.PrintHeader("Book Appointment");
+            Console.WriteLine();
             if (((Patient)currentPatient).Doctor == null)
             {
                 Console.WriteLine("You are not registered with any doctor! Please choose which doctor you would like to register with");
+                var doctors = _context.Doctors.ToArray();
+                PrintText.PrintMultipleDoctors(doctors);
 
-                foreach (var doctor in _context.Doctors)
-                {
-                    Console.WriteLine(""); //finish the rest 
-                }
-            }
+                Console.WriteLine();
+                Console.WriteLine("Enter number to select doctor: ");
+                var number = Console.ReadLine();
+                var doctor = doctors[Convert.ToInt32(number) - 1]; // error check to majke sure that its a ujmber within the range 
+                ((Patient)currentPatient).Doctor = doctor; // use the repo for this 
+            } // have no type menu
         }
     }
 }
 
+
+
+
+
+
+
+
+
+
+// make sure all the menus work and then use repo for everything fill in rest of ther guidelines and then write the tests 
+// figure out printing multiple of the doctors nad how to approach that with differnet funcitons and also create service and unitofowrk class for the repository 

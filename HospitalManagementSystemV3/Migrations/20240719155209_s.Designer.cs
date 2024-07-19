@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HospitalManagementSystemV3.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240715145229_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240719155209_s")]
+    partial class s
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,22 +49,22 @@ namespace HospitalManagementSystemV3.Migrations
                         {
                             Id = 1,
                             Description = "General Checkup",
-                            DoctorId = new Guid("383bf44b-f74e-4b21-be15-339866d29628"),
-                            PatientId = new Guid("08742018-7f29-403d-bbc7-8fc5c095df25")
+                            DoctorId = new Guid("98b81add-f033-4c87-9681-9eda5d492fe2"),
+                            PatientId = new Guid("5f283af1-c2b1-4d7f-bd05-3fa37ef1c89f")
                         },
                         new
                         {
                             Id = 2,
                             Description = "Follow-up Visit",
-                            DoctorId = new Guid("383bf44b-f74e-4b21-be15-339866d29628"),
-                            PatientId = new Guid("a7fcb488-3a02-4b3e-a9c2-dc4793ce3bda")
+                            DoctorId = new Guid("98b81add-f033-4c87-9681-9eda5d492fe2"),
+                            PatientId = new Guid("2240ad66-74a9-4bff-a81d-ee455f9831bf")
                         },
                         new
                         {
                             Id = 3,
                             Description = "Consultation",
-                            DoctorId = new Guid("946b8c60-77fa-49d9-8aed-b42817ca2113"),
-                            PatientId = new Guid("ab17abe4-be1d-4d9c-9050-b01b29c303d8")
+                            DoctorId = new Guid("25208e07-fbda-42de-ba5a-ad2259fe4125"),
+                            PatientId = new Guid("b3798083-0b1c-42b9-90c3-c1265072602f")
                         });
                 });
 
@@ -105,7 +105,7 @@ namespace HospitalManagementSystemV3.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("383bf44b-f74e-4b21-be15-339866d29628"),
+                            Id = new Guid("98b81add-f033-4c87-9681-9eda5d492fe2"),
                             Address = "123 Main St, Anytown, USA",
                             Email = "john.doe@example.com",
                             Name = "Dr. John Doe",
@@ -115,7 +115,7 @@ namespace HospitalManagementSystemV3.Migrations
                         },
                         new
                         {
-                            Id = new Guid("946b8c60-77fa-49d9-8aed-b42817ca2113"),
+                            Id = new Guid("25208e07-fbda-42de-ba5a-ad2259fe4125"),
                             Address = "456 Oak St, Anytown, USA",
                             Email = "jane.smith@example.com",
                             Name = "Dr. Jane Smith",
@@ -123,6 +123,41 @@ namespace HospitalManagementSystemV3.Migrations
                             Phone = "098-765-4321",
                             Username = "jane_smith"
                         });
+                });
+
+            modelBuilder.Entity("HospitalManagementSystemV3.Models.Admin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("HospitalManagementSystemV3.Models.Patient", b =>
@@ -135,7 +170,7 @@ namespace HospitalManagementSystemV3.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("DoctorId")
+                    b.Property<Guid?>("DoctorId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -167,9 +202,9 @@ namespace HospitalManagementSystemV3.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("08742018-7f29-403d-bbc7-8fc5c095df25"),
+                            Id = new Guid("5f283af1-c2b1-4d7f-bd05-3fa37ef1c89f"),
                             Address = "789 Pine St, Anytown, USA",
-                            DoctorId = new Guid("383bf44b-f74e-4b21-be15-339866d29628"),
+                            DoctorId = new Guid("98b81add-f033-4c87-9681-9eda5d492fe2"),
                             Email = "patient.one@example.com",
                             Name = "Patient One",
                             Password = "password123",
@@ -178,9 +213,9 @@ namespace HospitalManagementSystemV3.Migrations
                         },
                         new
                         {
-                            Id = new Guid("a7fcb488-3a02-4b3e-a9c2-dc4793ce3bda"),
+                            Id = new Guid("2240ad66-74a9-4bff-a81d-ee455f9831bf"),
                             Address = "321 Elm St, Anytown, USA",
-                            DoctorId = new Guid("383bf44b-f74e-4b21-be15-339866d29628"),
+                            DoctorId = new Guid("98b81add-f033-4c87-9681-9eda5d492fe2"),
                             Email = "patient.two@example.com",
                             Name = "Patient Two",
                             Password = "password123",
@@ -189,9 +224,9 @@ namespace HospitalManagementSystemV3.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ab17abe4-be1d-4d9c-9050-b01b29c303d8"),
+                            Id = new Guid("b3798083-0b1c-42b9-90c3-c1265072602f"),
                             Address = "654 Birch St, Anytown, USA",
-                            DoctorId = new Guid("946b8c60-77fa-49d9-8aed-b42817ca2113"),
+                            DoctorId = new Guid("25208e07-fbda-42de-ba5a-ad2259fe4125"),
                             Email = "patient.three@example.com",
                             Name = "Patient Three",
                             Password = "password123",
@@ -223,9 +258,7 @@ namespace HospitalManagementSystemV3.Migrations
                 {
                     b.HasOne("Doctor", "Doctor")
                         .WithMany("Patients")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DoctorId");
 
                     b.Navigation("Doctor");
                 });

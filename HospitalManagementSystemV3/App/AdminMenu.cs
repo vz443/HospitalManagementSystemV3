@@ -1,6 +1,6 @@
-﻿using HospitalManagementSystemV3.App.Print;
+﻿using HospitalManagementSystemV3.App.Interface;
+using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +13,19 @@ namespace HospitalManagementSystemV3.App
     {
         public AdminMenu(AppDbContext context, IUser loggedInUser)
         {
+            context = _context;
 
+            _loggedInUser = loggedInUser;
         }
+
+        AppDbContext _context;
+
+        IUser _loggedInUser;
 
         public void DisplayMainMenu()
         {
             Console.Clear();
-            base.PrintHeader("Administrator Menu");
+            PrintText.PrintHeader("Administrator Menu");
 
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
@@ -92,16 +98,47 @@ namespace HospitalManagementSystemV3.App
 
         public void ListAllDoctors()
         {
+            Console.Clear();
+           PrintText.PrintHeader("All Doctors");
+            Console.WriteLine("PRINT THE HEADER FOR IT HERE THAT LINES UP ");
 
+            foreach (var doctor in _context.Doctors)
+            {
+                Console.WriteLine("PRINT DETAILS HERE");
+            }
         }
 
         public void CheckDoctorDetails()
         {
+            Console.Clear();
+           PrintText.PrintHeader("Doctor Details");
+            Console.WriteLine();
 
+            Console.WriteLine("Please enter the ID of the doctor who's detail you are checking. Or press n to return to menu");
+            var id  = Console.ReadLine();
+            Console.WriteLine();
+
+            Console.WriteLine(""); //print header for doctor details in the print text class 
+
+            foreach (var doctor in _context.Doctors)
+            {
+                if (doctor.Username == id)
+                {
+                    Console.WriteLine(/*print the formatted doctor details*/); // replace all by getbyid in the repo 
+                }
+            }
         }
 
         public void ListAllPatients()
         {
+            Console.Clear();
+           PrintText.PrintHeader("All Patients");
+            Console.WriteLine();
+            // write header for patient here from printclass
+            foreach (var patients in _context.Patients)
+            {
+                Console.WriteLine(/*write patients here that is formatted*/);
+            }
 
         }
 

@@ -1,4 +1,4 @@
-﻿using HospitalManagementSystemV3.Interface;
+﻿using HospitalManagementSystemV3.App.Interface;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +19,7 @@ namespace HospitalManagementSystemV3.Models
         public required string Username { get; set; }
         public required string Password { get; set; }
 
-        public required Guid DoctorId { get; set; }
+        public Guid? DoctorId { get; set; }
         public Doctor? Doctor { get; set; }
 
         public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();

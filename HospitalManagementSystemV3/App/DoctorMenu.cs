@@ -1,6 +1,6 @@
-﻿using HospitalManagementSystemV3.App.Print;
+﻿using HospitalManagementSystemV3.App.Interface;
+using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Interface;
 using HospitalManagementSystemV3.Models;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using System;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace HospitalManagementSystemV3.App
 {
-    class DoctorMenu : PrintText, IMenu
+    class DoctorMenu : IMenu
     {
         public DoctorMenu(AppDbContext context, IUser loggedInUser)
         {
@@ -38,7 +38,7 @@ namespace HospitalManagementSystemV3.App
         public void DisplayMainMenu()
         {
             Console.Clear();
-            base.PrintHeader("Doctor Menu");
+           PrintText.PrintHeader("Doctor Menu");
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -107,7 +107,7 @@ namespace HospitalManagementSystemV3.App
         public void ListDoctorDetails()
         {
             Console.Clear();
-            base.PrintHeader("My Details");
+            PrintText.PrintHeader("My Details");
             Console.WriteLine("Name            | Email Address   | Phone        | Address");
             Console.WriteLine($"{currentDoctor.Name,-16}| {currentDoctor.Email,-18}| {currentDoctor.Phone,-14}| {currentDoctor.Address}"); //make this line up 
 
@@ -138,7 +138,7 @@ namespace HospitalManagementSystemV3.App
         public void CheckParticularPatient()
         {
             Console.Clear();
-            base.PrintHeader("Check Patient Details");
+           PrintText.PrintHeader("Check Patient Details");
             Console.WriteLine();
 
             Console.Write("Enter the ID of the patient to check: ");
@@ -151,6 +151,7 @@ namespace HospitalManagementSystemV3.App
                 {
                     Console.WriteLine("Patient            | Doctor   | Email Address        | Phone     | Address");
                     Console.WriteLine($"{patient.Name,-16}| {currentDoctor.Name,-18}| {patient.Email,-14}| {patient.Phone}|  {patient.Address}"); //make this line up and create method to do this in the print class
+                    break;
                 }
             }
 
@@ -162,7 +163,7 @@ namespace HospitalManagementSystemV3.App
         public void ListAppointmentsWithPatient()
         {
             Console.Clear();
-            base.PrintHeader("Appointments With");
+           PrintText.PrintHeader("Appointments With");
             Console.WriteLine();
 
             Console.Write("Enter the ID of the patient you would like to view the appointments for: ");

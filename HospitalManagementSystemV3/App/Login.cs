@@ -1,6 +1,6 @@
-﻿using HospitalManagementSystemV3.App.Print;
+﻿using HospitalManagementSystemV3.App.Interface;
+using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Interface;
 using HospitalManagementSystemV3.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Security;
@@ -21,11 +21,6 @@ namespace HospitalManagementSystemV3.App
         public IUser LoggedInUser { get; private set; }
 
         AppDbContext _context;
-
-        public override void PrintHeader(string title)
-        {
-            base.PrintHeader(title);
-        }
 
         public void DisplayMainMenu()
         {

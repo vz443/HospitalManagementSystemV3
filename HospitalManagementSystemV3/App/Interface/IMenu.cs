@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HospitalManagementSystemV3.Interface
+namespace HospitalManagementSystemV3.App.Interface
 {
     public interface IMenu
     {
-        public void PrintHeader(string title);
-
         public void DisplayMainMenu();
     }
 }

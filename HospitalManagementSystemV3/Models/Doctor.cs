@@ -1,4 +1,4 @@
-﻿using HospitalManagementSystemV3.Interface;
+﻿using HospitalManagementSystemV3.App.Interface;
 using HospitalManagementSystemV3.Models;
 using System.ComponentModel.DataAnnotations;
 
