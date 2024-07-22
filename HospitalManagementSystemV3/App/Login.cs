@@ -24,22 +24,57 @@ namespace HospitalManagementSystemV3.App
 
         public void DisplayMainMenu()
         {
-            Console.Write("ID: ");
-            var username = Console.ReadLine();
-
-            string password = GetPassword();
-              
-            while (!ValidateLogin(username, password))
+            while (true)
             {
-                password = GetPassword();
-                if (!ValidateLogin(username, password))
-                {
-                    Console.WriteLine("Invalid Credentials");
-                }    
-            }
-            Console.WriteLine("Valid Credentials");
+                Console.Clear();
+                PrintText.PrintHeader("Login");
 
-            IsLoggedIn = true;
+                Console.Write("ID: ");
+                var username = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    Console.WriteLine("Username cannot be empty. Please try again.");
+                    continue;
+                }
+
+                string password = GetPassword();
+
+                while (true)
+                {
+                    if (ValidateLogin(username, password))
+                    {
+                        Console.WriteLine("\nValid Credentials");
+                        IsLoggedIn = true;
+                        return;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        PrintText.PrintHeader("Login");
+                        Console.WriteLine("Invalid Credentials");
+                        Console.WriteLine("1. Try again with the same username");
+                        Console.WriteLine("2. Enter a new username");
+                        Console.Write("Choice: ");
+                        var choice = Console.ReadLine();
+
+                        if (choice == "1")
+                        {
+                            Console.Clear();
+                            PrintText.PrintHeader("Login");
+                            password = GetPassword();
+                        }
+                        else if (choice == "2")
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid choice. Please try again.");
+                        }
+                    }
+                }
+            }
         }
 
         public string GetPassword()
@@ -48,25 +83,28 @@ namespace HospitalManagementSystemV3.App
             string password = string.Empty;
             ConsoleKeyInfo keyInfo;
 
-            do
+            while (true)
             {
                 keyInfo = Console.ReadKey(true);
                 if (!char.IsControl(keyInfo.KeyChar))
                 {
-                    password += (keyInfo.KeyChar);
+                    password += keyInfo.KeyChar;
                     Console.Write("*");
                 }
-                if (keyInfo.Key == ConsoleKey.Backspace && password.Length > 0)
+                else if (keyInfo.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
                     Console.Write("\b \b");
                     password = password[0..^1];
                 }
-            }
-            while (keyInfo.Key != ConsoleKey.Enter);
-            {
-                return password;
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return password;
+                }
             }
         }
+
+
 
         public bool ValidateLogin(string username, string password)
         {

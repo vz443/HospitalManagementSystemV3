@@ -1,5 +1,6 @@
 ﻿using HospitalManagementSystemV3.App.Interface;
 using HospitalManagementSystemV3.App.Print;
+using HospitalManagementSystemV3.App.Repository;
 using HospitalManagementSystemV3.Database;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,16 @@ namespace HospitalManagementSystemV3.App
     {
         public AdminMenu(AppDbContext context, IUser loggedInUser)
         {
-            context = _context;
+            _doctorRepository = new DoctorRepository(context);
+
+            _patientRepository = new PatientRepository(context);
 
             _loggedInUser = loggedInUser;
         }
 
-        AppDbContext _context;
+        private DoctorRepository _doctorRepository;
+
+        private PatientRepository _patientRepository;
 
         IUser _loggedInUser;
 
@@ -99,52 +104,43 @@ namespace HospitalManagementSystemV3.App
         public void ListAllDoctors()
         {
             Console.Clear();
-           PrintText.PrintHeader("All Doctors");
-            Console.WriteLine("PRINT THE HEADER FOR IT HERE THAT LINES UP ");
-
-            foreach (var doctor in _context.Doctors)
-            {
-                Console.WriteLine("PRINT DETAILS HERE");
-            }
+            PrintText.PrintHeader("All Doctors");
+            Console.WriteLine();
+            PrintText.PrintDoctors(_doctorRepository.GetAll().ToArray()); 
         }
 
         public void CheckDoctorDetails()
         {
             Console.Clear();
-           PrintText.PrintHeader("Doctor Details");
+            PrintText.PrintHeader("Doctor Details");
             Console.WriteLine();
 
             Console.WriteLine("Please enter the ID of the doctor who's detail you are checking. Or press n to return to menu");
-            var id  = Console.ReadLine();
+            var userID  = Console.ReadLine();
             Console.WriteLine();
-
-            Console.WriteLine(""); //print header for doctor details in the print text class 
-
-            foreach (var doctor in _context.Doctors)
-            {
-                if (doctor.Username == id)
-                {
-                    Console.WriteLine(/*print the formatted doctor details*/); // replace all by getbyid in the repo 
-                }
-            }
+            var doctor = _doctorRepository.GetById(userID);
+            PrintText.PrintDoctors(new List<Doctor> { doctor });
         }
 
         public void ListAllPatients()
         {
-            Console.Clear();
+           Console.Clear();
            PrintText.PrintHeader("All Patients");
-            Console.WriteLine();
-            // write header for patient here from printclass
-            foreach (var patients in _context.Patients)
-            {
-                Console.WriteLine(/*write patients here that is formatted*/);
-            }
+           Console.WriteLine();
+           PrintText.PrintMultiplePatients(_patientRepository.GetAll().ToArray());
 
         }
 
         public void CheckPatientDetails()
         {
+            Console.Clear();
+            PrintText.PrintHeader("Patient Details");
 
+            Console.WriteLine();
+            Console.WriteLine("Please enter the ID of the patient who's details you are checking. Or press n to return to menu");
+            var id = Console.ReadLine();
+
+            _patientRepository.GetById(id);
         }
 
         public void AddDoctor()

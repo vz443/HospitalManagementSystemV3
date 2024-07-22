@@ -18,7 +18,7 @@ namespace LibraryApp.Repositories
             _context = context; // Injected database context
         }
 
-        public T GetById(int id)
+        public T GetById(string id)
         {
             return _context.Set<T>().Find(id); // Find entity by ID
         }

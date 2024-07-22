@@ -1,18 +1,22 @@
 ﻿using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
 using LibraryApp.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace HospitalManagementSystemV3.App.Repository
 {
     class DoctorRepository : Repository<Doctor>
     {
-        DoctorRepository(AppDbContext context) : base(context)
+        public DoctorRepository(AppDbContext context) : base(context)
         {
             _context = context;
         }
 
-        AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public void Add(Doctor entity)
         {
@@ -21,17 +25,19 @@ namespace HospitalManagementSystemV3.App.Repository
 
         public IEnumerable<Doctor> Find(Expression<Func<Doctor, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return _context.Doctors.Where(predicate).ToList();
         }
 
         public IEnumerable<Doctor> GetAll()
         {
-            return _context.Doctors;
+            return _context.Doctors.Include(d => d.Patients).Include(d => d.Appointments).ToList();
         }
 
-        public Doctor GetById(int id)
+        public Doctor GetByuserId(string username)
         {
-            throw new NotImplementedException();
+            return _context.Doctors.Include(d => d.Patients)
+                                       .Include(d => d.Appointments)
+                                       .FirstOrDefault(d => d.Username == username);
         }
 
         public void Remove(Doctor entity)
@@ -46,7 +52,7 @@ namespace HospitalManagementSystemV3.App.Repository
 
         public void Update(Doctor entity)
         {
-            throw new NotImplementedException();
+            _context.Doctors.Update(entity);
         }
     }
 }

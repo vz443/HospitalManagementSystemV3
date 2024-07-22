@@ -9,7 +9,7 @@ namespace HospitalManagementSystemV3.App.Interface
 {
     interface IRepository<T> where T : class
     {
-        T GetById(int id); // Get entity by ID
+        T GetById(string userID); // Get entity by ID
         IEnumerable<T> GetAll(); // Get all entities
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate); // Find entities by predicate
         void Add(T entity); // Add entity

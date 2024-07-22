@@ -2,6 +2,7 @@
 using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyModel.Resolution;
 using System;
 using System.Collections.Generic;
@@ -163,31 +164,36 @@ namespace HospitalManagementSystemV3.App
         public void ListAppointmentsWithPatient()
         {
             Console.Clear();
-           PrintText.PrintHeader("Appointments With");
+            PrintText.PrintHeader("Appointments With");
             Console.WriteLine();
 
-            Console.Write("Enter the ID of the patient you would like to view the appointments for: ");
-            var patientID = Console.ReadLine();
+            Console.Write("Enter the username of the patient you would like to view the appointments for: ");
+            var patientUsername = Console.ReadLine();
 
-            var patient = _context.Patients.FirstOrDefault(x => x.Username == patientID);
+            var patient = _context.Patients
+                                  .Include(p => p.Appointments)
+                                  .ThenInclude(a => a.Doctor)
+                                  .FirstOrDefault(x => x.Username == patientUsername);
 
             if (patient != null)
             {
+                Console.WriteLine($"Appointments for {patient.Name}");
                 foreach (var appointment in patient.Appointments)
                 {
-                    Console.WriteLine("Write the top line here");
+                    Console.WriteLine("Doctor Name       | Patient Name        | Description");
                     Console.WriteLine($"{appointment.Doctor.Name}       | {appointment.Patient.Name}        | {appointment.Description}");
                 }
             }
             else
             {
-                // error check here 
+                Console.WriteLine("No patient found with the provided username.");
             }
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
+
 
         public void Logout()
         {

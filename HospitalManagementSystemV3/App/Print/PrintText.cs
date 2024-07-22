@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HospitalManagementSystemV3.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -50,42 +51,7 @@ namespace HospitalManagementSystemV3.App.Print
             Console.WriteLine("┘");
         }
 
-        public static void PrintSingleDoctor(Doctor doctor)
-        {
-            const int nameWidth = 21;
-            const int emailWidth = 23;
-            const int phoneWidth = 19;
-            const int addressWidth = 25;
-
-            string FormatField(string value, int width)
-            {
-                if (value.Length <= width) return value.PadRight(width);
-                return string.Join("\n", Enumerable.Range(0, (value.Length + width - 1) / width)
-                    .Select(i => value.Substring(i * width, Math.Min(width, value.Length - i * width)).PadRight(width)));
-            }
-
-            Console.WriteLine("Name             | Email Address     | Phone         | Address              ");
-            Console.WriteLine("-------------------------------------------------------------------------------");
-
-            var nameLines = FormatField(doctor.Name, nameWidth).Split('\n');
-            var emailLines = FormatField(doctor.Email, emailWidth).Split('\n');
-            var phoneLines = FormatField(doctor.Phone, phoneWidth).Split('\n');
-            var addressLines = FormatField(doctor.Address, addressWidth).Split('\n');
-
-            var maxLines = new[] { nameLines.Length, emailLines.Length, phoneLines.Length, addressLines.Length }.Max();
-
-            for (int i = 0; i < maxLines; i++)
-            {
-                var name = i < nameLines.Length ? nameLines[i] : new string(' ', nameWidth);
-                var email = i < emailLines.Length ? emailLines[i] : new string(' ', emailWidth);
-                var phone = i < phoneLines.Length ? phoneLines[i] : new string(' ', phoneWidth);
-                var address = i < addressLines.Length ? addressLines[i] : new string(' ', addressWidth);
-
-                Console.WriteLine($"{name} | {email} | {phone} | {address}");
-            }
-        }
-
-        public static void PrintMultipleDoctors(ICollection<Doctor> doctors)
+        public static void PrintDoctors(IEnumerable<Doctor> doctors)
         {
             const int numberWidth = 5;
             const int nameWidth = 16;
@@ -129,6 +95,98 @@ namespace HospitalManagementSystemV3.App.Print
                 number++;
             }
         }
+
+        public static void PrintPatients(ICollection<Patient> patients)
+        {
+            const int numberWidth = 5;
+            const int patientNameWidth = 16;
+            const int doctorNameWidth = 16;
+            const int emailWidth = 18;
+            const int phoneWidth = 14;
+            const int addressWidth = 20;
+
+            string FormatField(string value, int width)
+            {
+                if (value.Length <= width) return value.PadRight(width);
+                return string.Join("\n", Enumerable.Range(0, (value.Length + width - 1) / width)
+                    .Select(i => value.Substring(i * width, Math.Min(width, value.Length - i * width)).PadRight(width)));
+            }
+
+            Console.WriteLine("No.  | Patient Name     | Doctor Name       | Email Address     | Phone         | Address");
+            Console.WriteLine("---------------------------------------------------------------------------------------");
+
+            int number = 1;
+            foreach (var patient in patients)
+            {
+                var numberLines = number.ToString().PadRight(numberWidth).Split('\n');
+                var patientNameLines = FormatField(patient.Name, patientNameWidth).Split('\n');
+                var doctorNameLines = FormatField(patient.Doctor?.Name ?? "No Doctor", doctorNameWidth).Split('\n');
+                var emailLines = FormatField(patient.Email, emailWidth).Split('\n');
+                var phoneLines = FormatField(patient.Phone, phoneWidth).Split('\n');
+                var addressLines = FormatField(patient.Address, addressWidth).Split('\n');
+
+                var maxLines = new[] { numberLines.Length, patientNameLines.Length, doctorNameLines.Length, emailLines.Length, phoneLines.Length, addressLines.Length }.Max();
+
+                for (int i = 0; i < maxLines; i++)
+                {
+                    var numberText = i < numberLines.Length ? numberLines[i] : new string(' ', numberWidth);
+                    var patientName = i < patientNameLines.Length ? patientNameLines[i] : new string(' ', patientNameWidth);
+                    var doctorName = i < doctorNameLines.Length ? doctorNameLines[i] : new string(' ', doctorNameWidth);
+                    var email = i < emailLines.Length ? emailLines[i] : new string(' ', emailWidth);
+                    var phone = i < phoneLines.Length ? phoneLines[i] : new string(' ', phoneWidth);
+                    var address = i < addressLines.Length ? addressLines[i] : new string(' ', addressWidth);
+
+                    Console.WriteLine($"{numberText} | {patientName} | {doctorName} | {email} | {phone} | {address}");
+                }
+
+                Console.WriteLine("---------------------------------------------------------------------------------------");
+                number++;
+            }
+        }
+
+        public static void PrintAppointments(ICollection<Appointment> appointments)
+        {
+            const int numberWidth = 4;
+            const int doctorNameWidth = 15;
+            const int patientNameWidth = 15;
+            const int descriptionWidth = 29;
+
+            string FormatField(string value, int width)
+            {
+                if (value.Length <= width) return value.PadRight(width);
+                return string.Join("\n", Enumerable.Range(0, (value.Length + width - 1) / width)
+                    .Select(i => value.Substring(i * width, Math.Min(width, value.Length - i * width)).PadRight(width)));
+            }
+
+            Console.WriteLine($"{"No".PadRight(numberWidth)} | {"Doctor Name".PadRight(doctorNameWidth)} | {"Patient Name".PadRight(patientNameWidth)} | {"Description".PadRight(descriptionWidth)}");
+            Console.WriteLine(new string('-', numberWidth + doctorNameWidth + patientNameWidth + descriptionWidth + 3 * 3 + 1));
+
+            int number = 1;
+            foreach (var appointment in appointments)
+            {
+                var numberLines = number.ToString().PadRight(numberWidth).Split('\n');
+                var doctorNameLines = FormatField(appointment.Doctor.Name, doctorNameWidth).Split('\n');
+                var patientNameLines = FormatField(appointment.Patient.Name, patientNameWidth).Split('\n');
+                var descriptionLines = FormatField(appointment.Description, descriptionWidth).Split('\n');
+
+                var maxLines = new[] { numberLines.Length, doctorNameLines.Length, patientNameLines.Length, descriptionLines.Length }.Max();
+
+                for (int i = 0; i < maxLines; i++)
+                {
+                    var numberText = i < numberLines.Length ? numberLines[i] : new string(' ', numberWidth);
+                    var doctorName = i < doctorNameLines.Length ? doctorNameLines[i] : new string(' ', doctorNameWidth);
+                    var patientName = i < patientNameLines.Length ? patientNameLines[i] : new string(' ', patientNameWidth);
+                    var description = i < descriptionLines.Length ? descriptionLines[i] : new string(' ', descriptionWidth);
+
+                    Console.WriteLine($"{numberText} | {doctorName} | {patientName} | {description}");
+                }
+
+                number++;
+            }
+        }
+
+
+
 
 
     }

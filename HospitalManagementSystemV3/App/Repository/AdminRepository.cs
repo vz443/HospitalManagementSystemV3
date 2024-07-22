@@ -7,7 +7,7 @@ namespace HospitalManagementSystemV3.App.Repository
 {
     class AdminRepository : Repository<Admin>
     {
-        AdminRepository(AppDbContext context) : base(context)
+        public AdminRepository(AppDbContext context) : base(context)
         {
             _context = context;
         }

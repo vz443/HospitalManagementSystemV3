@@ -1,5 +1,6 @@
 ﻿using HospitalManagementSystemV3.App.Interface;
 using HospitalManagementSystemV3.App.Print;
+using HospitalManagementSystemV3.App.Repository;
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace HospitalManagementSystemV3.App
 {
-    internal class PatientMenu : IMenu
+    class PatientMenu : IMenu
     {
         public PatientMenu(AppDbContext context, IUser loggedInUser)
         {
@@ -15,10 +16,14 @@ namespace HospitalManagementSystemV3.App
 
             _context = context;
 
+            _patientRepository = new PatientRepository(_context);
+
             currentPatient = loggedInUser;
 
             Startup();
         }
+
+        PatientRepository _patientRepository;
 
         AppDbContext _context;
 
@@ -134,20 +139,28 @@ namespace HospitalManagementSystemV3.App
             PrintText.PrintHeader("My Appointments");
             Console.WriteLine();
 
-            Console.WriteLine($"Appointments for {currentPatient.Name}");
-
-
             if (currentPatient != null)
             {
-                foreach (var appointment in ((Patient)currentPatient).Appointments)
+                var patientWithAppointments = _context.Patients
+                                                      .Include(p => p.Appointments)
+                                                      .ThenInclude(a => a.Doctor)
+                                                      .FirstOrDefault(p => p.Id == currentPatient.Id); // why cant this just be hte loggedinuser 
+
+                if (patientWithAppointments != null)
                 {
-                    Console.WriteLine("Write the top line here");
-                    Console.WriteLine($"{appointment.Doctor.Name}       | {appointment.Patient.Name}        | {appointment.Description}");
+                    Console.WriteLine($"Appointments for {patientWithAppointments.Name}");
+                    Console.WriteLine();
+
+                    PrintText.PrintMultipleAppointments(patientWithAppointments.Appointments);
+                }
+                else
+                {
+                    Console.WriteLine("No appointments found for the current patient.");
                 }
             }
             else
             {
-                // error check here 
+                Console.WriteLine("Current patient information is not available.");
             }
 
             Console.WriteLine("\nPress any key to return to the main menu...");
@@ -155,12 +168,17 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
+
         public void BookAppointments()
         {
             Console.Clear();
             PrintText.PrintHeader("Book Appointment");
             Console.WriteLine();
-            if (((Patient)currentPatient).Doctor == null)
+
+            var patient = (Patient)currentPatient;
+
+            // If the patient is not registered with any doctor
+            if (patient.Doctor == null)
             {
                 Console.WriteLine("You are not registered with any doctor! Please choose which doctor you would like to register with");
                 var doctors = _context.Doctors.ToArray();
@@ -169,9 +187,48 @@ namespace HospitalManagementSystemV3.App
                 Console.WriteLine();
                 Console.WriteLine("Enter number to select doctor: ");
                 var number = Console.ReadLine();
-                var doctor = doctors[Convert.ToInt32(number) - 1]; // error check to majke sure that its a ujmber within the range 
-                ((Patient)currentPatient).Doctor = doctor; // use the repo for this 
-            } // have no type menu
+
+                if (int.TryParse(number, out int doctorIndex) && doctorIndex >= 1 && doctorIndex <= doctors.Length)
+                {
+                    var doctor = doctors[doctorIndex - 1];
+                    patient.Doctor = doctor;
+                    _context.Patients.Update(patient); // Use repository method to update patient
+                    _context.SaveChanges(); // Save changes to the database
+
+                    Console.WriteLine("You have been successfully registered with the selected doctor.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid selection. Please try again.");
+                }
+            } // get description as it doesnt work if it is choosing doctor
+            {
+                Console.WriteLine($"You are booking an appointment with {patient.Doctor.Name}");
+                Console.WriteLine("Description of the appointment:");
+                var description = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    Console.WriteLine("Appointment description cannot be empty.");
+                    return;
+                }
+
+                var appointment = new Appointment
+                {
+                    Doctor = patient.Doctor,
+                    Patient = patient,
+                    Description = description
+                };
+
+                _context.Appointments.Add(appointment); // Use repository method to add appointment
+                _context.SaveChanges(); // Save changes to the database
+
+                Console.WriteLine("The appointment has been booked successfully.");
+            }
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
     }
 }
