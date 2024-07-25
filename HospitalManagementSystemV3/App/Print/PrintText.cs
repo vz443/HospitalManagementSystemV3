@@ -51,7 +51,27 @@ namespace HospitalManagementSystemV3.App.Print
             Console.WriteLine("┘");
         }
 
-        public static void PrintDoctors(IEnumerable<Doctor> doctors)
+        public static void Print<T>(params T[] items)
+        {
+            if (items == null || items.Length == 0) return;
+
+            var itemType = items[0].GetType();
+
+            if (itemType == typeof(Doctor))
+            {
+                PrintDoctors(items.Cast<Doctor>().ToArray());
+            }
+            else if (itemType == typeof(Appointment))
+            {
+                PrintAppointments(items.Cast<Appointment>().ToArray());
+            }
+            else if (itemType == typeof(Patient))
+            {
+                PrintPatients(items.Cast<Patient>().ToArray());
+            }
+        }
+
+        private static void PrintDoctors(params Doctor[] doctors) // this is broken and needs to be fixed
         {
             const int numberWidth = 5;
             const int nameWidth = 16;
@@ -96,7 +116,7 @@ namespace HospitalManagementSystemV3.App.Print
             }
         }
 
-        public static void PrintPatients(ICollection<Patient> patients)
+        private static void PrintPatients(ICollection<Patient> patients)
         {
             const int numberWidth = 5;
             const int patientNameWidth = 16;
@@ -144,7 +164,7 @@ namespace HospitalManagementSystemV3.App.Print
             }
         }
 
-        public static void PrintAppointments(ICollection<Appointment> appointments)
+        private static void PrintAppointments(ICollection<Appointment> appointments)
         {
             const int numberWidth = 4;
             const int doctorNameWidth = 15;

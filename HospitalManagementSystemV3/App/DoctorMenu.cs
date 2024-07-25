@@ -1,16 +1,8 @@
 ﻿using HospitalManagementSystemV3.App.Interface;
 using HospitalManagementSystemV3.App.Print;
+using HospitalManagementSystemV3.App.Repository;
 using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyModel.Resolution;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace HospitalManagementSystemV3.App
 {
@@ -20,15 +12,19 @@ namespace HospitalManagementSystemV3.App
         {
             Console.Clear();
 
-            _context = context;
+            _doctorRepository = new DoctorRepository(context);
+
+            _patientRepository = new PatientRepository(context);
 
             currentDoctor = loggedInUser;
-
+            testContext = context;
             Startup();
         }
 
-        AppDbContext _context;
+        DoctorRepository _doctorRepository;
 
+        PatientRepository _patientRepository;
+        AppDbContext testContext;
         IUser currentDoctor;
 
         void Startup()
@@ -144,17 +140,9 @@ namespace HospitalManagementSystemV3.App
 
             Console.Write("Enter the ID of the patient to check: ");
             var ID = Console.ReadLine();
-            var patients = _context.Patients;
-
-            foreach (var patient in patients)
-            {
-                if (patient.Username == ID)
-                {
-                    Console.WriteLine("Patient            | Doctor   | Email Address        | Phone     | Address");
-                    Console.WriteLine($"{patient.Name,-16}| {currentDoctor.Name,-18}| {patient.Email,-14}| {patient.Phone}|  {patient.Address}"); //make this line up and create method to do this in the print class
-                    break;
-                }
-            }
+            var patients = _patientRepository.GetAll();
+            var patient = _patientRepository.GetById(ID);
+            PrintText.Print(patient);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
@@ -167,24 +155,13 @@ namespace HospitalManagementSystemV3.App
             PrintText.PrintHeader("Appointments With");
             Console.WriteLine();
 
-            Console.Write("Enter the username of the patient you would like to view the appointments for: ");
+            Console.Write("Enter the ID of the patient you would like to view the appointments for: ");
             var patientUsername = Console.ReadLine();
+            var patient = _patientRepository.GetById(patientUsername);
 
-            var patient = _context.Patients
-                                  .Include(p => p.Appointments)
-                                  .ThenInclude(a => a.Doctor)
-                                  .FirstOrDefault(x => x.Username == patientUsername);
+            PrintText.Print(patient);
 
-            if (patient != null)
-            {
-                Console.WriteLine($"Appointments for {patient.Name}");
-                foreach (var appointment in patient.Appointments)
-                {
-                    Console.WriteLine("Doctor Name       | Patient Name        | Description");
-                    Console.WriteLine($"{appointment.Doctor.Name}       | {appointment.Patient.Name}        | {appointment.Description}");
-                }
-            }
-            else
+            if (patient == null)
             {
                 Console.WriteLine("No patient found with the provided username.");
             }

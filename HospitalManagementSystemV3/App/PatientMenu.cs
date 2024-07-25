@@ -126,7 +126,7 @@ namespace HospitalManagementSystemV3.App
 
             var doctor = ((Patient)currentPatient).Doctor;
 
-            PrintText.PrintSingleDoctor(doctor);
+            PrintText.Print(doctor);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
@@ -151,7 +151,7 @@ namespace HospitalManagementSystemV3.App
                     Console.WriteLine($"Appointments for {patientWithAppointments.Name}");
                     Console.WriteLine();
 
-                    PrintText.PrintMultipleAppointments(patientWithAppointments.Appointments);
+                    PrintText.Print(patientWithAppointments.Appointments.ToArray());
                 }
                 else
                 {
@@ -182,7 +182,7 @@ namespace HospitalManagementSystemV3.App
             {
                 Console.WriteLine("You are not registered with any doctor! Please choose which doctor you would like to register with");
                 var doctors = _context.Doctors.ToArray();
-                PrintText.PrintMultipleDoctors(doctors);
+                PrintText.Print(doctors);
 
                 Console.WriteLine();
                 Console.WriteLine("Enter number to select doctor: ");

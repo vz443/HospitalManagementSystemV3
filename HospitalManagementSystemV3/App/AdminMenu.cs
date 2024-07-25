@@ -106,7 +106,7 @@ namespace HospitalManagementSystemV3.App
             Console.Clear();
             PrintText.PrintHeader("All Doctors");
             Console.WriteLine();
-            PrintText.PrintDoctors(_doctorRepository.GetAll().ToArray()); 
+            PrintText.Print(_doctorRepository.GetAll().ToArray()); 
         }
 
         public void CheckDoctorDetails()
@@ -118,8 +118,7 @@ namespace HospitalManagementSystemV3.App
             Console.WriteLine("Please enter the ID of the doctor who's detail you are checking. Or press n to return to menu");
             var userID  = Console.ReadLine();
             Console.WriteLine();
-            var doctor = _doctorRepository.GetById(userID);
-            PrintText.PrintDoctors(new List<Doctor> { doctor });
+            PrintText.Print(_doctorRepository.GetById(userID));
         }
 
         public void ListAllPatients()
@@ -127,7 +126,7 @@ namespace HospitalManagementSystemV3.App
            Console.Clear();
            PrintText.PrintHeader("All Patients");
            Console.WriteLine();
-           PrintText.PrintMultiplePatients(_patientRepository.GetAll().ToArray());
+           PrintText.Print(_patientRepository.GetAll().ToArray());
 
         }
 
