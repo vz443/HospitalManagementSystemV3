@@ -14,8 +14,6 @@ namespace HospitalManagementSystemV3.App
 
             _doctorRepository = new DoctorRepository(context);
 
-            _patientRepository = new PatientRepository(context);
-
             currentDoctor = loggedInUser;
             testContext = context;
             Startup();
@@ -23,7 +21,6 @@ namespace HospitalManagementSystemV3.App
 
         DoctorRepository _doctorRepository;
 
-        PatientRepository _patientRepository;
         AppDbContext testContext;
         IUser currentDoctor;
 
@@ -84,7 +81,7 @@ namespace HospitalManagementSystemV3.App
                     ListPatients();
                     break;
                 case 3:
-                    ListAppointmentsWithPatient();
+                    ListAppointments();
                     break;
                 case 4:
                     CheckParticularPatient();
@@ -140,8 +137,8 @@ namespace HospitalManagementSystemV3.App
 
             Console.Write("Enter the ID of the patient to check: ");
             var ID = Console.ReadLine();
-            var patients = _patientRepository.GetAll();
-            var patient = _patientRepository.GetById(ID);
+            var patients = _doctorRepository.GetAllPatients();
+            var patient = _doctorRepository.GetPatientById(ID);
             PrintText.Print(patient);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
@@ -157,7 +154,7 @@ namespace HospitalManagementSystemV3.App
 
             Console.Write("Enter the ID of the patient you would like to view the appointments for: ");
             var patientUsername = Console.ReadLine();
-            var patient = _patientRepository.GetById(patientUsername);
+            var patient = _doctorRepository.GetPatientById(patientUsername);
 
             PrintText.Print(patient);
 
@@ -171,6 +168,10 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
+        public void ListAllAppointments()
+        {
+
+        }
 
         public void Logout()
         {

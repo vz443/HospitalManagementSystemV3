@@ -1,6 +1,7 @@
+﻿
 namespace HospitalManagementSystemTest
 {
-    public class Tests
+    class DoctorRepositoryTest
     {
         [SetUp]
         public void Setup()

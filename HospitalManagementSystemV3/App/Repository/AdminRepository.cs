@@ -1,6 +1,7 @@
 ﻿using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
 using LibraryApp.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace HospitalManagementSystemV3.App.Repository
@@ -24,17 +25,43 @@ namespace HospitalManagementSystemV3.App.Repository
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Admin> GetAll()
+        public IEnumerable<Patient> GetAllPatients()
         {
-            return _context.Admins;
+            return _context.Patients;
         }
 
-        public Admin GetById(int id)
+        public IEnumerable<Doctor> GetAllDoctors()
         {
-            throw new NotImplementedException();
+            return _context.Doctors;
         }
 
-        public void Remove(Admin entity)
+        public Patient GetPatientById(string id)
+        {
+            return _context.Patients
+                           .Include(p => p.Doctor)
+                           .Include(p => p.Appointments)
+                           .ThenInclude(a => a.Doctor)
+                           .FirstOrDefault(p => p.Username == id);
+        }
+
+        public Doctor GetDoctorById(string id)
+        {
+            return _context.Doctors
+                            .Include(d => d.Patients)
+                            .FirstOrDefault(d => d.Username == id);
+        }
+
+        public void AddDoctor(Doctor entity)
+        {
+
+        }
+
+        public void AddPatient(Patient entity)
+        {
+
+        }
+
+        public void RemoveAdmin(Admin entity)
         {
             _context.Admins.Remove(entity);
         }

@@ -4,6 +4,7 @@ using HospitalManagementSystemV3.App.Repository;
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace HospitalManagementSystemV3.App
@@ -14,9 +15,7 @@ namespace HospitalManagementSystemV3.App
         {
             Console.Clear();
 
-            _context = context;
-
-            _patientRepository = new PatientRepository(_context);
+            _patientRepository = new PatientRepository(context);
 
             currentPatient = loggedInUser;
 
@@ -24,8 +23,6 @@ namespace HospitalManagementSystemV3.App
         }
 
         PatientRepository _patientRepository;
-
-        AppDbContext _context;
 
         IUser currentPatient;
 
@@ -133,25 +130,21 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
-        public void ListAllAppointments()
+        public void ListAllAppointments() // this is broken for some reason 
         {
             Console.Clear();
             PrintText.PrintHeader("My Appointments");
             Console.WriteLine();
-
+            var patient = (Patient)currentPatient;
             if (currentPatient != null)
             {
-                var patientWithAppointments = _context.Patients
-                                                      .Include(p => p.Appointments)
-                                                      .ThenInclude(a => a.Doctor)
-                                                      .FirstOrDefault(p => p.Id == currentPatient.Id); // why cant this just be hte loggedinuser 
 
-                if (patientWithAppointments != null)
+                if (patient != null)
                 {
-                    Console.WriteLine($"Appointments for {patientWithAppointments.Name}");
+                    Console.WriteLine($"Appointments for {patient.Name}");
                     Console.WriteLine();
 
-                    PrintText.Print(patientWithAppointments.Appointments.ToArray());
+                    PrintText.Print(_patientRepository.GetAllAppointmentsForPatient(patient).ToArray());
                 }
                 else
                 {
@@ -181,7 +174,7 @@ namespace HospitalManagementSystemV3.App
             if (patient.Doctor == null)
             {
                 Console.WriteLine("You are not registered with any doctor! Please choose which doctor you would like to register with");
-                var doctors = _context.Doctors.ToArray();
+                var doctors = _patientRepository.GetAllDoctors().ToArray();
                 PrintText.Print(doctors);
 
                 Console.WriteLine();
@@ -192,8 +185,8 @@ namespace HospitalManagementSystemV3.App
                 {
                     var doctor = doctors[doctorIndex - 1];
                     patient.Doctor = doctor;
-                    _context.Patients.Update(patient); // Use repository method to update patient
-                    _context.SaveChanges(); // Save changes to the database
+                    _patientRepository.Update(patient); // Use repository method to update patient
+                    _patientRepository.SaveChanges(); // Save changes to the database
 
                     Console.WriteLine("You have been successfully registered with the selected doctor.");
                 }
@@ -220,8 +213,8 @@ namespace HospitalManagementSystemV3.App
                     Description = description
                 };
 
-                _context.Appointments.Add(appointment); // Use repository method to add appointment
-                _context.SaveChanges(); // Save changes to the database
+                _patientRepository.AddAppointment(appointment); // Use repository method to add appointment
+                _patientRepository.SaveChanges(); // Save changes to the database
 
                 Console.WriteLine("The appointment has been booked successfully.");
             }

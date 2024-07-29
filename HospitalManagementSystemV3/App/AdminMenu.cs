@@ -1,9 +1,12 @@
-﻿using HospitalManagementSystemV3.App.Interface;
+﻿using Azure.Identity;
+using HospitalManagementSystemV3.App.Interface;
 using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.App.Repository;
 using HospitalManagementSystemV3.Database;
+using HospitalManagementSystemV3.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,16 +17,12 @@ namespace HospitalManagementSystemV3.App
     {
         public AdminMenu(AppDbContext context, IUser loggedInUser)
         {
-            _doctorRepository = new DoctorRepository(context);
-
-            _patientRepository = new PatientRepository(context);
+            _adminRepository = new AdminRepository(context);
 
             _loggedInUser = loggedInUser;
         }
 
-        private DoctorRepository _doctorRepository;
-
-        private PatientRepository _patientRepository;
+        private AdminRepository _adminRepository;
 
         IUser _loggedInUser;
 
@@ -106,7 +105,7 @@ namespace HospitalManagementSystemV3.App
             Console.Clear();
             PrintText.PrintHeader("All Doctors");
             Console.WriteLine();
-            PrintText.Print(_doctorRepository.GetAll().ToArray()); 
+            PrintText.Print(_adminRepository.GetAllDoctors().ToArray()); 
         }
 
         public void CheckDoctorDetails()
@@ -118,7 +117,7 @@ namespace HospitalManagementSystemV3.App
             Console.WriteLine("Please enter the ID of the doctor who's detail you are checking. Or press n to return to menu");
             var userID  = Console.ReadLine();
             Console.WriteLine();
-            PrintText.Print(_doctorRepository.GetById(userID));
+            PrintText.Print(_adminRepository.GetDoctorById(userID));
         }
 
         public void ListAllPatients()
@@ -126,7 +125,7 @@ namespace HospitalManagementSystemV3.App
            Console.Clear();
            PrintText.PrintHeader("All Patients");
            Console.WriteLine();
-           PrintText.Print(_patientRepository.GetAll().ToArray());
+           PrintText.Print(_adminRepository.GetAllPatients().ToArray());
 
         }
 
@@ -139,17 +138,101 @@ namespace HospitalManagementSystemV3.App
             Console.WriteLine("Please enter the ID of the patient who's details you are checking. Or press n to return to menu");
             var id = Console.ReadLine();
 
-            _patientRepository.GetById(id);
+            _adminRepository.GetPatientById(id);
         }
 
         public void AddDoctor()
         {
+            Console.Clear();
+            PrintText.PrintHeader("Add Doctor");
+            Console.WriteLine();
 
+            Console.Write("Username: ");
+            var username = Console.ReadLine();
+
+            Console.WriteLine();
+
+            Console.Write("Password: ");
+            var password = Console.ReadLine();
+            Console.WriteLine();
+            Console.Write("First Name: ");
+            var firstName = Console.ReadLine();
+            Console.WriteLine();
+            Console.Write("Last Name: ");
+            var lastName = Console.ReadLine();
+            Console.WriteLine();
+            var name = firstName + lastName;
+            Console.Write("Email: ");
+            Console.WriteLine();
+            var email = Console.ReadLine();
+            Console.Write("Phone: ");
+            var phone = Console.ReadLine();
+            Console.WriteLine();
+            Console.Write("Street Number");
+            var streetNumber = Console.ReadLine();
+            Console.WriteLine();
+            Console.Write("Street");
+            var street = Console.ReadLine();
+            Console.WriteLine();
+
+            var address = streetNumber + street;
+
+            var doctor = new Doctor
+            {
+                Id = Guid.NewGuid(),  // Generate a new unique ID for the doctor
+                Name = name,
+                Email = email,
+                Phone = phone,
+                Address = address,
+                Username = username,
+                Password = password
+            };
+
+            _adminRepository.AddDoctor(doctor);
         }
 
         public void AddPatient()
         {
+            Console.Clear();
+            PrintText.PrintHeader("Add Patient");
+            Console.WriteLine();
 
+            Console.WriteLine("Registering a new patient with the DOTNET Hospital Management System");
+            Console.Write("Username: ");
+            var username = Console.ReadLine();
+            Console.Write("Password: ");
+            var password = Console.ReadLine();
+            Console.Write("First Name: ");
+            var firstName = Console.ReadLine();
+            Console.Write("Last Name: ");
+            var lastName = Console.ReadLine();
+            var name = firstName + lastName;
+            Console.Write("Email: ");
+            var email = Console.ReadLine();
+            Console.Write("Phone: ");
+            var phone = Console.ReadLine();
+            Console.Write("Street Number: ");
+            var streetNumber = Console.ReadLine();
+            Console.Write("Street: ");
+            var streetName = Console.ReadLine();
+            Console.Write("City: ");
+            var city = Console.ReadLine();
+            Console.Write("State: ");
+            var state = Console.ReadLine();
+            var address = streetNumber + streetName + city + state;
+
+            var patient = new Patient
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Email = email,
+                Phone = phone,
+                Address = address,
+                Username = username,
+                Password = password
+            };
+
+            _adminRepository.AddPatient(patient);
         }
     }
 }

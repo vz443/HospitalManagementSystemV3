@@ -2,60 +2,41 @@
 using HospitalManagementSystemV3.Models;
 using LibraryApp.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace HospitalManagementSystemV3.App.Repository
 {
-    class PatientRepository : Repository<Patient>
+    public class PatientRepository : Repository<Patient>
     {
         public PatientRepository(AppDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        private readonly AppDbContext _context;
-
-        public void Add(Patient entity)
+        public IEnumerable<Doctor> GetAllDoctors()
         {
-            _context.Patients.Add(entity);
+            return _context.Doctors.ToList(); // Fetch all doctors from the database
         }
 
-        public IEnumerable<Patient> Find(Expression<Func<Patient, bool>> predicate)
+        public void UpdatePatient(Patient patient)
         {
-            return _context.Patients.Where(predicate).ToList();
+            _context.Patients.Update(patient); // Update the patient entity in the context
         }
 
-        public IEnumerable<Patient> GetAll()
+        public void AddAppointment(Appointment appointment)
         {
-            return _context.Patients.Include(p => p.Doctor).ToList();
+            _context.Appointments.Add(appointment); // Add the appointment entity to the context
         }
 
-        public Patient GetById(string userID)
+        public IEnumerable<Appointment> GetAllAppointmentsForPatient(Patient patient)
         {
-            return _context.Patients.Include(p => p.Doctor).FirstOrDefault(p => p.Username == userID);
+            return _context.Appointments
+                           .Include(a => a.Doctor)
+                           .Where(a => a.PatientId == patient.Id)
+                           .ToList(); // Fetch all appointments for a specific patient
         }
-
-        public void Remove(Patient entity)
+        public new void SaveChanges()
         {
-            _context.Patients.Remove(entity);
-        }
-
-        public void SaveChanges()
-        {
-            _context.SaveChanges();
-        }
-
-        public void Update(Patient entity)
-        {
-            _context.Patients.Update(entity);
-        }
-
-        public void GetPatientAppointments(Patient entity)
-        {
-
+            _context.SaveChanges(); // Save changes to the database
         }
     }
 }

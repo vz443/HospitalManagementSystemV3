@@ -51,11 +51,11 @@ namespace HospitalManagementSystemV3.App.Print
             Console.WriteLine("┘");
         }
 
-        public static void Print<T>(params T[] items)
+        public static void Print<T>(params T[] items) // change what passed in to match doctor 
         {
             if (items == null || items.Length == 0) return;
 
-            var itemType = items[0].GetType();
+            var itemType = typeof(T);
 
             if (itemType == typeof(Doctor))
             {
@@ -70,6 +70,7 @@ namespace HospitalManagementSystemV3.App.Print
                 PrintPatients(items.Cast<Patient>().ToArray());
             }
         }
+
 
         private static void PrintDoctors(params Doctor[] doctors) // this is broken and needs to be fixed
         {
@@ -182,6 +183,7 @@ namespace HospitalManagementSystemV3.App.Print
             Console.WriteLine(new string('-', numberWidth + doctorNameWidth + patientNameWidth + descriptionWidth + 3 * 3 + 1));
 
             int number = 1;
+
             foreach (var appointment in appointments)
             {
                 var numberLines = number.ToString().PadRight(numberWidth).Split('\n');
@@ -204,10 +206,6 @@ namespace HospitalManagementSystemV3.App.Print
                 number++;
             }
         }
-
-
-
-
 
     }
 }

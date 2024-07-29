@@ -2,10 +2,8 @@
 using HospitalManagementSystemV3.Models;
 using LibraryApp.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace HospitalManagementSystemV3.App.Repository
 {
@@ -13,46 +11,34 @@ namespace HospitalManagementSystemV3.App.Repository
     {
         public DoctorRepository(AppDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        private readonly AppDbContext _context;
-
-        public void Add(Doctor entity)
+        public void AddDoctor(Doctor entity)
         {
-            _context.Doctors.Add(entity);
+            _context.Doctors.Add(entity); // Add a new doctor to the context
         }
 
-        public IEnumerable<Doctor> Find(Expression<Func<Doctor, bool>> predicate)
+        public IEnumerable<Patient> GetAllPatients()
         {
-            return _context.Doctors.Where(predicate).ToList();
+            return _context.Patients.ToList(); // Retrieve all patients from the database
         }
 
-        public IEnumerable<Doctor> GetAll()
+        public Patient GetPatientById(string id)
         {
-            return _context.Doctors.Include(d => d.Patients).Include(d => d.Appointments).ToList();
+            return _context.Patients
+                           .Include(p => p.Doctor)
+                           .Include(p => p.Appointments)
+                           .FirstOrDefault(p => p.Username == id); // Find the patient by ID and include related entities
         }
 
-        public Doctor GetByuserId(string username)
+        public new void SaveChanges()
         {
-            return _context.Doctors.Include(d => d.Patients)
-                                       .Include(d => d.Appointments)
-                                       .FirstOrDefault(d => d.Username == username);
-        }
-
-        public void Remove(Doctor entity)
-        {
-            _context.Doctors.Remove(entity);
-        }
-
-        public void SaveChanges()
-        {
-            _context.SaveChanges();
+            _context.SaveChanges(); // Save changes to the database
         }
 
         public void Update(Doctor entity)
         {
-            _context.Doctors.Update(entity);
+            _context.Doctors.Update(entity); // Update the doctor entity in the context
         }
     }
 }
