@@ -8,31 +8,32 @@ namespace HospitalManagementSystemV3.App
 {
     class DoctorMenu : IMenu
     {
-        public DoctorMenu(AppDbContext context, IUser loggedInUser)
+        public DoctorMenu(AppDbContext context, IUser loggedInUser, Login login)
         {
             Console.Clear();
 
             _doctorRepository = new DoctorRepository(context);
 
-            currentDoctor = (Doctor)loggedInUser;
-            testContext = context;
-            Startup();
-        }
+            _currentDoctor = (Doctor)loggedInUser;
 
-        DoctorRepository _doctorRepository;
+            _login = login;
 
-        AppDbContext testContext;
-        Doctor currentDoctor;
-
-        void Startup()
-        {
             DisplayMainMenu();
         }
 
+        private DoctorRepository _doctorRepository;
+
+        private Login _login;
+
+        private Doctor _currentDoctor;
+
+        /// <summary>
+        /// Displays the main menu for the doctor.
+        /// </summary>
         public void DisplayMainMenu()
         {
             Console.Clear();
-           PrintText.PrintHeader("Doctor Menu");
+            PrintText.PrintHeader("Doctor Menu");
             Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -90,77 +91,72 @@ namespace HospitalManagementSystemV3.App
                     ListAppointmentsWithPatient();
                     break;
                 case 6:
-                    Logout();
+                    _login.Logout();
                     break;
                 case 7:
                     Environment.Exit(0);
                     break;
-            }    
+            }
         }
 
+        /// <summary>
+        /// Lists the details of the current doctor.
+        /// </summary>
         public void ListDoctorDetails()
         {
-            Console.Clear();
-            PrintText.PrintHeader("My Details");
-            Console.WriteLine("Name            | Email Address   | Phone        | Address");
-            Console.WriteLine($"{currentDoctor.Name,-16}| {currentDoctor.Email,-18}| {currentDoctor.Phone,-14}| {currentDoctor.Address}"); //make this line up 
+            Utils.CreateHeader("My Details");
+            PrintText.Print(_currentDoctor);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        /// <summary>
+        /// Lists all patients assigned to the current doctor.
+        /// </summary>
         public void ListPatients()
         {
-            Console.Clear();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine($"Patients assigned to {currentDoctor.Name}: ");
+            Utils.CreateHeader("List Current Patients");
+            Console.WriteLine($"Patients assigned to {_currentDoctor.Name}: ");
             Console.WriteLine();
 
-            Console.WriteLine("Patient            | Doctor   | Email Address        | Phone     | Address");
-            foreach (var patient in ((Doctor)currentDoctor).Patients)
-            {
-                Console.WriteLine($"{patient.Name,-16}| {currentDoctor.Name,-18}| {patient.Email,-14}| {patient.Phone}|  {patient.Address}"); //make this line up 
-            }
+            PrintText.Print(_currentDoctor.Patients);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        /// <summary>
+        /// Checks details of a specific patient by their ID. Allows retry if patient ID is not found.
+        /// </summary>
         public void CheckParticularPatient()
         {
-            Console.Clear();
-           PrintText.PrintHeader("Check Patient Details");
-            Console.WriteLine();
+            Utils.CreateHeader("Particular Patient Details");
 
-            Console.Write("Enter the ID of the patient to check: ");
-            var ID = Console.ReadLine();
-            var patients = _doctorRepository.GetAllPatients();
-            var patient = _doctorRepository.GetPatientById(ID);
-            PrintText.Print(patient);
-
-            Console.WriteLine("\nPress any key to return to the main menu...");
-            Console.ReadKey();
-            DisplayMainMenu();
-        }
-
-        public void ListAppointmentsWithPatient()
-        {
-            Console.Clear();
-            PrintText.PrintHeader("Appointments With");
-            Console.WriteLine();
-
-            Console.Write("Enter the ID of the patient you would like to view the appointments for: ");
-            var patientUsername = Console.ReadLine();
-            var patient = _doctorRepository.GetPatientById(patientUsername);
-
-            PrintText.Print(patient);
-
-            if (patient == null)
+            bool isValidId = false;
+            while (!isValidId)
             {
-                Console.WriteLine("No patient found with the provided username.");
+                Console.Write("Enter the ID of the patient to check (or press 'r' to return to the main menu): ");
+                var id = Console.ReadLine() ?? string.Empty;
+
+                if (id.ToLower() == "r")
+                {
+                    DisplayMainMenu();
+                    return;
+                }
+
+                var patient = _doctorRepository.GetPatientById(id);
+                if (patient != null)
+                {
+                    PrintText.Print(patient);
+                    isValidId = true;
+                }
+                else
+                {
+                    Console.WriteLine("No patient found with the provided ID. Please try again.");
+                }
             }
 
             Console.WriteLine("\nPress any key to return to the main menu...");
@@ -168,22 +164,58 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
+        /// <summary>
+        /// Lists all appointments with a specific patient by their ID. Allows retry if patient ID is not found.
+        /// </summary>
+        public void ListAppointmentsWithPatient()
+        {
+            Utils.CreateHeader("Appointments with Patient");
+
+            bool isValidId = false;
+            while (!isValidId)
+            {
+                Console.Write("Enter the ID of the patient you would like to view the appointments for (or press 'r' to return to the main menu): ");
+                var patientUsername = Console.ReadLine() ?? string.Empty;
+
+                if (patientUsername.ToLower() == "r")
+                {
+                    DisplayMainMenu();
+                    return;
+                }
+
+                var patient = _doctorRepository.GetPatientById(patientUsername);
+
+                if (patient != null)
+                {
+                    PrintText.Print(patient);
+                    isValidId = true;
+                }
+                else
+                {
+                    Console.WriteLine("No patient found with the provided username. Please try again.");
+                }
+            }
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
+        }
+
+
+        /// <summary>
+        /// Lists all appointments for the current doctor.
+        /// </summary>
         public void ListAllAppointments()
         {
             Console.Clear();
             PrintText.PrintHeader("All Appointments");
             Console.WriteLine();
 
-            PrintText.Print(_doctorRepository.GetAllAppointmentsForDoctor(currentDoctor).ToArray());
+            PrintText.Print(_doctorRepository.GetAllAppointmentsForDoctor(_currentDoctor).ToArray());
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
-        }
-
-        public void Logout()
-        {
-            //call base logout
         }
     }
 }

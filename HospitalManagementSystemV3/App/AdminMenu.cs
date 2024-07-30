@@ -8,21 +8,26 @@ using System.Text;
 
 namespace HospitalManagementSystemV3.App
 {
-    class AdminMenu : PrintText,  IMenu
+    class AdminMenu : IMenu
     {
-        public AdminMenu(AppDbContext context, IUser loggedInUser)
+        public AdminMenu(AppDbContext context, IUser loggedInUser, Login login)
         {
             _adminRepository = new AdminRepository(context);
 
             _loggedInUser = loggedInUser;
+
+            _login = login;
 
             DisplayMainMenu();
         }
 
         private AdminRepository _adminRepository;
 
-        IUser _loggedInUser;
+        private Login _login;
 
+        private IUser _loggedInUser;
+
+        // Display the main menu for the administrator
         public void DisplayMainMenu()
         {
             Console.Clear();
@@ -89,7 +94,7 @@ namespace HospitalManagementSystemV3.App
                     AddPatient();
                     break;
                 case 7:
-                    //logout 
+                    _login.Logout();
                     break;
                 case 8:
                     Environment.Exit(0);
@@ -97,93 +102,121 @@ namespace HospitalManagementSystemV3.App
             }
         }
 
+        // List all doctors in the system
         public void ListAllDoctors()
         {
             Utils.CreateHeader("All Doctors");
-            PrintText.Print(_adminRepository.GetAllDoctors().ToArray());
+            var doctors = _adminRepository.GetAllDoctors();
+            PrintText.Print(doctors?.ToArray() ?? new Doctor[0]);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        // Print specific details about a doctor
         public void CheckDoctorDetails()
         {
             Utils.CreateHeader("Doctor Details");
 
-            Console.WriteLine("Please enter the ID of the doctor who's detail you are checking. Or press n to return to menu");
-            var userID  = Console.ReadLine();
-            Console.WriteLine();
-            PrintText.Print(_adminRepository.GetDoctorById(userID));
+            Console.WriteLine("Please enter the ID of the doctor whose details you are checking. Or press r to return to the menu.");
+            var userId = Console.ReadLine();
+
+            while (true)
+            {
+                if (userId == "r")
+                {
+                    DisplayMainMenu();
+                    return;
+                }
+
+                var doctor = _adminRepository.GetDoctorById(userId);
+
+                if (doctor != null)
+                {
+                    PrintText.Print(doctor);
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Doctor not found. Please enter a valid ID or press r to return to the menu.");
+                    userId = Console.ReadLine();
+                }
+            }
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        // List all patients in the system
         public void ListAllPatients()
         {
-           Console.Clear();
-           PrintText.PrintHeader("All Patients");
-           Console.WriteLine();
-           PrintText.Print(_adminRepository.GetAllPatients().ToArray());
+            Utils.CreateHeader("All Patients");
+            var patients = _adminRepository.GetAllPatients();
+            PrintText.Print(patients?.ToArray() ?? new Patient[0]);
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        // Check details of a specific patient
         public void CheckPatientDetails()
         {
-            Console.Clear();
-            PrintText.PrintHeader("Patient Details");
-
-            Console.WriteLine();
-            Console.WriteLine("Please enter the ID of the patient who's details you are checking. Or press n to return to menu");
+            Utils.CreateHeader("Patient Details");
+            Console.WriteLine("Please enter the ID of the patient whose details you are checking. Or press n to return to menu");
             var id = Console.ReadLine();
 
-            _adminRepository.GetPatientById(id);
+            var patient = _adminRepository.GetPatientById(id);
+
+            if (patient != null)
+            {
+                PrintText.Print(patient);
+            }
+            else
+            {
+                Console.WriteLine("Patient not found.");
+            }
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        // Add a new doctor to the system
         public void AddDoctor()
         {
-            Console.Clear();
-            PrintText.PrintHeader("Add Doctor");
-            Console.WriteLine();
+            Utils.CreateHeader("Add Doctor");
 
             Console.Write("Username: ");
-            var username = Console.ReadLine();
-
-            Console.WriteLine();
+            var username = Console.ReadLine() ?? string.Empty;
 
             Console.Write("Password: ");
-            var password = Console.ReadLine();
-            Console.WriteLine();
-            Console.Write("First Name: ");
-            var firstName = Console.ReadLine();
-            Console.WriteLine();
-            Console.Write("Last Name: ");
-            var lastName = Console.ReadLine();
-            Console.WriteLine();
-            var name = firstName + lastName;
-            Console.Write("Email: ");
-            Console.WriteLine();
-            var email = Console.ReadLine();
-            Console.Write("Phone: ");
-            var phone = Console.ReadLine();
-            Console.WriteLine();
-            Console.Write("Street Number");
-            var streetNumber = Console.ReadLine();
-            Console.WriteLine();
-            Console.Write("Street");
-            var street = Console.ReadLine();
-            Console.WriteLine();
+            var password = Console.ReadLine() ?? string.Empty;
 
-            var address = streetNumber + street;
+            Console.Write("First Name: ");
+            var firstName = Console.ReadLine() ?? string.Empty;
+
+            Console.Write("Last Name: ");
+            var lastName = Console.ReadLine() ?? string.Empty;
+
+            var name = firstName + lastName;
+
+            Console.Write("Email: ");
+            var email = Console.ReadLine() ?? string.Empty;
+
+            Console.Write("Phone: ");
+            var phone = Console.ReadLine() ?? string.Empty;
+
+            Console.Write("Street Number: ");
+            var streetNumber = Console.ReadLine() ?? string.Empty;
+
+            Console.Write("Street: ");
+            var street = Console.ReadLine() ?? string.Empty;
+
+
+            var address = (streetNumber ?? string.Empty) + (street ?? string.Empty);
 
             var doctor = new Doctor
             {
@@ -203,26 +236,25 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
+        // Add a new patient to the system
         public void AddPatient()
         {
-            Console.Clear();
-            PrintText.PrintHeader("Add Patient");
-            Console.WriteLine();
+            Utils.CreateHeader("Add Patient");
 
             Console.WriteLine("Registering a new patient with the DOTNET Hospital Management System");
             Console.Write("Username: ");
-            var username = Console.ReadLine();
+            var username = Console.ReadLine() ?? string.Empty;
             Console.Write("Password: ");
-            var password = Console.ReadLine();
+            var password = Console.ReadLine() ?? string.Empty;
             Console.Write("First Name: ");
-            var firstName = Console.ReadLine();
+            var firstName = Console.ReadLine() ?? string.Empty;
             Console.Write("Last Name: ");
-            var lastName = Console.ReadLine();
+            var lastName = Console.ReadLine() ?? string.Empty;
             var name = firstName + lastName;
             Console.Write("Email: ");
-            var email = Console.ReadLine();
+            var email = Console.ReadLine() ?? string.Empty;
             Console.Write("Phone: ");
-            var phone = Console.ReadLine();
+            var phone = Console.ReadLine() ?? string.Empty;
             Console.Write("Street Number: ");
             var streetNumber = Console.ReadLine();
             Console.Write("Street: ");
@@ -231,7 +263,7 @@ namespace HospitalManagementSystemV3.App
             var city = Console.ReadLine();
             Console.Write("State: ");
             var state = Console.ReadLine();
-            var address = streetNumber + streetName + city + state;
+            var address = (streetNumber ?? string.Empty) + (streetName ?? string.Empty) + (city ?? string.Empty) + (state ?? string.Empty);
 
             var patient = new Patient
             {

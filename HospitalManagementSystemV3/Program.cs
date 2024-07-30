@@ -2,29 +2,27 @@
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
+using System;
 
 var context = new AppDbContext();
 
-Admin admins = new  Admin{ Id = Guid.NewGuid(), Name = "Dr. A", Email = "a@example.com", Phone = "123456", Address = "Address A", Username = "admin", Password = "admin" };
-context.Admins.Add(admins);
-context.SaveChanges();
 Login login = new Login(context);
 
-
-
-if (login.IsLoggedIn)
+while (true)
 {
-    if (login.LoggedInUser.GetType() == typeof(Doctor))
+    if (login.IsLoggedIn)
     {
-        DoctorMenu doctor = new(context, login.LoggedInUser);
-    }
-    else if (login.LoggedInUser.GetType() == typeof(Patient))
-    {
-        PatientMenu patient = new(context, login.LoggedInUser);
-    }
-    else if (login.LoggedInUser.GetType() == typeof(Admin))
-    {
-        AdminMenu admin = new(context, login.LoggedInUser);
+        if (login.LoggedInUser.GetType() == typeof(Doctor))
+        {
+            DoctorMenu doctorMenu = new DoctorMenu(context, login.LoggedInUser, login);
+        }
+        else if (login.LoggedInUser.GetType() == typeof(Patient))
+        {
+            PatientMenu patientMenu = new PatientMenu(context, login.LoggedInUser, login);
+        }
+        else if (login.LoggedInUser.GetType() == typeof(Admin))
+        {
+            AdminMenu adminMenu = new AdminMenu(context, login.LoggedInUser, login);
+        }
     }
 }

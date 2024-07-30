@@ -11,26 +11,26 @@ namespace HospitalManagementSystemV3.App
 {
     class PatientMenu : IMenu
     {
-        public PatientMenu(AppDbContext context, IUser loggedInUser)
+        public PatientMenu(AppDbContext context, IUser loggedInUser, Login login)
         {
             Console.Clear();
 
             _patientRepository = new PatientRepository(context);
 
-            currentPatient = loggedInUser;
+            _currentPatient = loggedInUser;
 
-            Startup();
+            _login = login;
+
+            DisplayMainMenu();
         }
 
         PatientRepository _patientRepository;
 
-        IUser currentPatient;
+        Login _login;
 
-        public void Startup()
-        {
-            DisplayMainMenu();
-        }
+        IUser _currentPatient;
 
+        // Display the main menu for the patient
         public void DisplayMainMenu()
         {
             Console.Clear();
@@ -88,7 +88,7 @@ namespace HospitalManagementSystemV3.App
                     BookAppointments();
                     break;
                 case 5:
-                    //ExitToLogin();
+                    _login.Logout();
                     break;
                 case 6:
                     Environment.Exit(0);
@@ -96,32 +96,30 @@ namespace HospitalManagementSystemV3.App
             }
         }
 
+        // List the details of the current patient
         public void ListPatientDetails()
         {
-            Console.Clear();
-            PrintText.PrintHeader("My Details");
-            Console.WriteLine();
-            Console.WriteLine($"{currentPatient.Name}'s Details");
-            Console.WriteLine($"Patient ID: {currentPatient.Username}");
-            Console.WriteLine($"Full Name: {currentPatient.Name}");
-            Console.WriteLine($"Address: {currentPatient.Address}");
-            Console.WriteLine($"Email: {currentPatient.Email}");
-            Console.WriteLine($"Phone: {currentPatient.Phone}");
+            Utils.CreateHeader("List Patient Details");
+            Console.WriteLine($"{_currentPatient.Name}'s Details");
+            Console.WriteLine($"Patient ID: {_currentPatient.Username}");
+            Console.WriteLine($"Full Name: {_currentPatient.Name}");
+            Console.WriteLine($"Address: {_currentPatient.Address}");
+            Console.WriteLine($"Email: {_currentPatient.Email}");
+            Console.WriteLine($"Phone: {_currentPatient.Phone}");
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
             DisplayMainMenu();
         }
 
+        // List the details of the doctor associated with the current patient
         public void ListDoctorDetails()
         {
-            Console.Clear();
-            PrintText.PrintHeader("My Doctor");
-            Console.WriteLine();
+            Utils.CreateHeader("My Doctor");
             Console.WriteLine("Your doctor: ");
             Console.WriteLine();
 
-            var doctor = ((Patient)currentPatient).Doctor;
+            var doctor = ((Patient)_currentPatient).Doctor;
 
             PrintText.Print(doctor);
 
@@ -130,15 +128,13 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
-        public void ListAllAppointments() // this is broken for some reason 
+        // List all appointments for the current patient
+        public void ListAllAppointments()
         {
-            Console.Clear();
-            PrintText.PrintHeader("My Appointments");
-            Console.WriteLine();
-            var patient = (Patient)currentPatient;
-            if (currentPatient != null)
+            Utils.CreateHeader("List Appointments");
+            var patient = (Patient)_currentPatient;
+            if (_currentPatient != null)
             {
-
                 if (patient != null)
                 {
                     Console.WriteLine($"Appointments for {patient.Name}");
@@ -161,14 +157,12 @@ namespace HospitalManagementSystemV3.App
             DisplayMainMenu();
         }
 
-
+        // Book a new appointment for the current patient
         public void BookAppointments()
         {
-            Console.Clear();
-            PrintText.PrintHeader("Book Appointment");
-            Console.WriteLine();
+            Utils.CreateHeader("Book Appointment");
 
-            var patient = (Patient)currentPatient;
+            var patient = (Patient)_currentPatient;
 
             // If the patient is not registered with any doctor
             if (patient.Doctor == null)
@@ -193,29 +187,27 @@ namespace HospitalManagementSystemV3.App
                 {
                     Console.WriteLine("Invalid selection. Please try again.");
                 }
-            } // get description as it doesnt work if it is choosing doctor
-            {
-                Console.WriteLine($"You are booking an appointment with {patient.Doctor.Name}");
-                Console.WriteLine("Description of the appointment:");
-                var description = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(description))
-                {
-                    Console.WriteLine("Appointment description cannot be empty.");
-                    return;
-                }
-
-                var appointment = new Appointment
-                {
-                    Doctor = patient.Doctor,
-                    Patient = patient,
-                    Description = description
-                };
-
-                _patientRepository.AddAppointment(appointment); // Use repository method to add appointment
-
-                Console.WriteLine("The appointment has been booked successfully.");
             }
+            Console.WriteLine($"You are booking an appointment with {patient.Doctor.Name}");
+            Console.Write("Description of the appointment:");
+            var description = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                Console.WriteLine("Appointment description cannot be empty.");
+                return;
+            }
+
+            var appointment = new Appointment
+            {
+                Doctor = patient.Doctor,
+                Patient = patient,
+                Description = description
+            };
+
+            _patientRepository.AddAppointment(appointment); // Use repository method to add appointment
+
+            Console.WriteLine("The appointment has been booked successfully.");
 
             Console.WriteLine("\nPress any key to return to the main menu...");
             Console.ReadKey();
@@ -223,15 +215,3 @@ namespace HospitalManagementSystemV3.App
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-// make sure all the menus work and then use repo for everything fill in rest of ther guidelines and then write the tests 
-// figure out printing multiple of the doctors nad how to approach that with differnet funcitons and also create service and unitofowrk class for the repository 

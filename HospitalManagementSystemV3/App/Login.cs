@@ -1,10 +1,6 @@
 ﻿using HospitalManagementSystemV3.App.Interface;
 using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Security;
-using System.Windows.Markup;
 
 namespace HospitalManagementSystemV3.App
 {
@@ -13,15 +9,20 @@ namespace HospitalManagementSystemV3.App
         public Login(AppDbContext context)
         {
             _context = context;
-            PrintHeader("Login");
-            DisplayMainMenu();
+            LoginScreen();
         }
-        
+
         public bool IsLoggedIn { get; private set; }
 
         public IUser LoggedInUser { get; private set; }
 
-        AppDbContext _context;
+        private AppDbContext _context;
+
+        public void LoginScreen()
+        {
+            PrintHeader("Login");
+            DisplayMainMenu();
+        }
 
         public void DisplayMainMenu()
         {
@@ -105,32 +106,17 @@ namespace HospitalManagementSystemV3.App
             }
         }
 
-
-
         public bool ValidateLogin(string username, string password)
         {
             var doctorList = _context.Doctors.ToList();
-
             var patientList = _context.Patients.ToList();
-
             var adminList = _context.Admins.ToList();
 
-             List<IUser> totalList =new List<IUser>();
+            List<IUser> totalList = new List<IUser>();
 
-            foreach (IUser user in patientList)
-            {
-                totalList.Add(user);
-            }
-
-            foreach (IUser user in doctorList)
-            {
-                totalList.Add(user);
-            }
-
-            foreach (IUser admin in adminList)
-            {
-                totalList.Add(admin);
-            }
+            totalList.AddRange(patientList);
+            totalList.AddRange(doctorList);
+            totalList.AddRange(adminList);
 
             foreach (var user in totalList)
             {
@@ -143,5 +129,13 @@ namespace HospitalManagementSystemV3.App
 
             return false;
         }
-    }               
+
+        public void Logout()
+        {
+            IsLoggedIn = false;
+            LoggedInUser = null;
+            Console.Clear();
+            LoginScreen();
+        }
+    }
 }

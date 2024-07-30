@@ -44,11 +44,13 @@ namespace HospitalManagementSystemV3.App.Repository
         public void AddDoctor(Doctor entity)
         {
             _context.Doctors.Add(entity);
+            _context.SaveChanges();
         }
 
         public void AddPatient(Patient entity)
         {
             _context.Patients.Add(entity);
+            _context.SaveChanges();
         }
 
         public void RemoveAdmin(Admin entity)

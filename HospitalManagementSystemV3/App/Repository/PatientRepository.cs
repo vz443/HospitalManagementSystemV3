@@ -2,7 +2,6 @@
 using HospitalManagementSystemV3.Models;
 using LibraryApp.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace HospitalManagementSystemV3.App.Repository
 {
