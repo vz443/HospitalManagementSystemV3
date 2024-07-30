@@ -1,16 +1,19 @@
-﻿
-using HospitalManagementSystemV3.App.Repository;
-using HospitalManagementSystemV3.Database;
-using HospitalManagementSystemV3.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using HospitalManagementSystemV3.Database;
+using HospitalManagementSystemV3.Models;
+using HospitalManagementSystemV3.App.Repository;
+using NUnit.Framework;
 
 namespace HospitalManagementSystemTest
 {
-    class DoctorRepositoryTest
+    public class AdminRepositoryTest
     {
         private Mock<AppDbContext>? _mockContext;
-        private DoctorRepository? _doctorRepository;
+        private AdminRepository? _adminRepository;
 
         [SetUp]
         public void Setup()
@@ -18,50 +21,18 @@ namespace HospitalManagementSystemTest
             _mockContext = new Mock<AppDbContext>();
 
             // Mock DbSet properties
+            var mockAdmins = new Mock<DbSet<Admin>>();
             var mockPatients = new Mock<DbSet<Patient>>();
-            var mockAppointments = new Mock<DbSet<Appointment>>();
             var mockDoctors = new Mock<DbSet<Doctor>>();
 
+            _mockContext.Setup(c => c.Admins).Returns(mockAdmins.Object);
             _mockContext.Setup(c => c.Patients).Returns(mockPatients.Object);
-            _mockContext.Setup(c => c.Appointments).Returns(mockAppointments.Object);
             _mockContext.Setup(c => c.Doctors).Returns(mockDoctors.Object);
 
             // Create repository instance
-            _doctorRepository = new DoctorRepository(_mockContext.Object);
+            _adminRepository = new AdminRepository(_mockContext.Object);
         }
 
-        [Test]
-        public void AddDoctor_AddsDoctor()
-        {
-            // Arrange
-            var doctor = new Doctor
-            {
-                Id = Guid.NewGuid(),
-                Name = "Dr. Smith",
-                Email = "smith@example.com",
-                Phone = "123456",
-                Address = "123 Main St",
-                Username = "drsmith",
-                Password = "password"
-            };
-
-            var mockDoctorsDbSet = new Mock<DbSet<Doctor>>();
-            var doctorData = new List<Doctor>().AsQueryable();
-
-            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.Provider).Returns(doctorData.Provider);
-            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.Expression).Returns(doctorData.Expression);
-            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.ElementType).Returns(doctorData.ElementType);
-            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.GetEnumerator()).Returns(doctorData.GetEnumerator());
-
-            _mockContext.Setup(c => c.Doctors).Returns(mockDoctorsDbSet.Object);
-
-            // Act
-            _doctorRepository.AddDoctor(doctor);
-
-            // Assert
-            mockDoctorsDbSet.Verify(m => m.Add(It.IsAny<Doctor>()), Times.Once());
-            _mockContext.Verify(c => c.SaveChanges(), Times.Never());
-        }
 
         [Test]
         public void GetAllPatients_ReturnsAllPatients()
@@ -82,44 +53,42 @@ namespace HospitalManagementSystemTest
             _mockContext.Setup(c => c.Patients).Returns(mockPatientsDbSet.Object);
 
             // Act
-            var result = _doctorRepository.GetAllPatients();
+            var result = _adminRepository.GetAllPatients();
 
             // Assert
             Assert.AreEqual(2, result.Count());
         }
 
         [Test]
-        public void GetAllAppointmentsForDoctor_ReturnsAppointments()
+        public void GetAllDoctors_ReturnsAllDoctors()
         {
             // Arrange
-            var doctor = new Doctor { Id = Guid.NewGuid(), Name = "John Doe", Email = "john@example.com", Phone = "123456", Address = "123 Main St", Username = "john", Password = "password" };
-            var appointments = new List<Appointment>
+            var doctors = new List<Doctor>
             {
-                new Appointment { Id = Guid.NewGuid(), PatientId = Guid.NewGuid(), DoctorId = doctor.Id, Description = "Check-up"},
-                new Appointment { Id = Guid.NewGuid(), PatientId = Guid.NewGuid(), DoctorId = doctor.Id, Description = "Follow-up"}
+                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Smith", Email = "smith@example.com", Phone = "123456", Address = "123 Main St", Username = "drsmith", Password = "password" },
+                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Doe", Email = "doe@example.com", Phone = "789101", Address = "456 Main St", Username = "drdoe", Password = "password" }
             }.AsQueryable();
 
-            var mockAppointmentsDbSet = new Mock<DbSet<Appointment>>();
-            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.Provider).Returns(appointments.Provider);
-            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.Expression).Returns(appointments.Expression);
-            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.ElementType).Returns(appointments.ElementType);
-            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.GetEnumerator()).Returns(appointments.GetEnumerator());
+            var mockDoctorsDbSet = new Mock<DbSet<Doctor>>();
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.Provider).Returns(doctors.Provider);
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.Expression).Returns(doctors.Expression);
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.ElementType).Returns(doctors.ElementType);
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.GetEnumerator()).Returns(doctors.GetEnumerator());
 
-            _mockContext.Setup(c => c.Appointments).Returns(mockAppointmentsDbSet.Object);
+            _mockContext.Setup(c => c.Doctors).Returns(mockDoctorsDbSet.Object);
 
             // Act
-            var result = _doctorRepository.GetAllAppointmentsForDoctor(doctor);
+            var result = _adminRepository.GetAllDoctors();
 
             // Assert
             Assert.AreEqual(2, result.Count());
-            Assert.IsTrue(result.All(a => a.DoctorId == doctor.Id));
         }
 
         [Test]
         public void GetPatientById_ReturnsPatient()
         {
             // Arrange
-            var doctor = new Doctor { Id = Guid.NewGuid(), Name = "John Doe", Email = "john@example.com", Phone = "123456", Address = "123 Main St", Username = "john", Password = "password" };
+            var patientId = "john";
             var patient = new Patient
             {
                 Id = Guid.NewGuid(),
@@ -129,7 +98,7 @@ namespace HospitalManagementSystemTest
                 Address = "123 Main St",
                 Username = "john",
                 Password = "password",
-                Doctor = doctor,
+                Doctor = new Doctor { Id = Guid.NewGuid(), Name = "Dr. A", Email = "a@example.com", Phone = "123456", Address = "Address A", Username = "dr.a", Password = "passA" },
                 Appointments = new List<Appointment>
                 {
                     new Appointment { Id = Guid.NewGuid(), PatientId = Guid.NewGuid(), DoctorId = Guid.NewGuid(), Description = "Check-up"}
@@ -147,27 +116,18 @@ namespace HospitalManagementSystemTest
             _mockContext.Setup(c => c.Patients).Returns(mockPatientsDbSet.Object);
 
             // Act
-            var result = _doctorRepository.GetPatientById(patient.Username);
+            var result = _adminRepository.GetPatientById(patientId);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(patient.Username, result.Username);
+            Assert.AreEqual(patientId, result.Username);
         }
 
         [Test]
-        public void SaveChanges_SavesToDatabase()
-        {
-            // Act
-            _doctorRepository.SaveChanges();
-
-            // Assert
-            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
-        }
-
-        [Test]
-        public void UpdateDoctor_UpdatesDoctor()
+        public void GetDoctorById_ReturnsDoctor()
         {
             // Arrange
+            var doctorId = "drsmith";
             var doctor = new Doctor
             {
                 Id = Guid.NewGuid(),
@@ -176,7 +136,11 @@ namespace HospitalManagementSystemTest
                 Phone = "123456",
                 Address = "123 Main St",
                 Username = "drsmith",
-                Password = "password"
+                Password = "password",
+                Patients = new List<Patient>
+                {
+                    new Patient { Id = Guid.NewGuid(), Name = "John Doe", Email = "john@example.com", Phone = "123456", Address = "123 Main St", Username = "john", Password = "password" }
+                }
             };
 
             var mockDoctorsDbSet = new Mock<DbSet<Doctor>>();
@@ -190,12 +154,54 @@ namespace HospitalManagementSystemTest
             _mockContext.Setup(c => c.Doctors).Returns(mockDoctorsDbSet.Object);
 
             // Act
-            doctor.Name = "Dr. Updated";
-            _doctorRepository.Update(doctor);
+            var result = _adminRepository.GetDoctorById(doctorId);
 
             // Assert
-            mockDoctorsDbSet.Verify(m => m.Update(It.IsAny<Doctor>()), Times.Once());
+            Assert.IsNotNull(result);
+            Assert.AreEqual(doctorId, result.Username);
+        }
+
+        [Test]
+        public void RemoveAdmin_RemovesAdmin()
+        {
+            // Arrange
+            var admin = new Admin
+            {
+                Id = Guid.NewGuid(),
+                Name = "Admin1",
+                Email = "admin1@example.com",
+                Phone = "123456789",
+                Address = "address",
+                Username = "admin1",
+                Password = "password"
+            };
+
+            var mockAdminsDbSet = new Mock<DbSet<Admin>>();
+            var adminData = new List<Admin> { admin }.AsQueryable();
+
+            mockAdminsDbSet.As<IQueryable<Admin>>().Setup(m => m.Provider).Returns(adminData.Provider);
+            mockAdminsDbSet.As<IQueryable<Admin>>().Setup(m => m.Expression).Returns(adminData.Expression);
+            mockAdminsDbSet.As<IQueryable<Admin>>().Setup(m => m.ElementType).Returns(adminData.ElementType);
+            mockAdminsDbSet.As<IQueryable<Admin>>().Setup(m => m.GetEnumerator()).Returns(adminData.GetEnumerator());
+
+            _mockContext.Setup(c => c.Admins).Returns(mockAdminsDbSet.Object);
+
+            // Act
+            _adminRepository.RemoveAdmin(admin);
+
+            // Assert
+            mockAdminsDbSet.Verify(m => m.Remove(It.IsAny<Admin>()), Times.Once());
             _mockContext.Verify(c => c.SaveChanges(), Times.Never());
+        }
+
+        [Test]
+        public void SaveChanges_SavesToDatabase()
+        {
+            // Act
+            _adminRepository.SaveChanges();
+
+            // Assert
+            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
         }
     }
 }

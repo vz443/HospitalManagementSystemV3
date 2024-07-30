@@ -6,18 +6,9 @@ using System.Text;
 
 var context = new AppDbContext();
 
-Console.WriteLine("\x1b[37m         ______________");  
-Console.WriteLine("\x1b[37m        |              |");
-Console.WriteLine("\x1b[37m        |    \x1b[31mHOSPITAL\x1b[37m  |");  
-Console.WriteLine("\x1b[37m        |     ____     |");
-Console.WriteLine("\x1b[37m        |    |    |    |");
-Console.WriteLine("\x1b[37m        |____|____|____|");
-Console.WriteLine("\x1b[37m       /  _         _  \\");
-Console.WriteLine("\x1b[37m      / _|_|_______|_|_ \\");
-Console.WriteLine("\x1b[37m     / |________________| \\");
-Console.WriteLine("\x1b[37m    |______________________|\x1b[0m");  
-Console.WriteLine();
-
+Admin admins = new  Admin{ Id = Guid.NewGuid(), Name = "Dr. A", Email = "a@example.com", Phone = "123456", Address = "Address A", Username = "admin", Password = "admin" };
+context.Admins.Add(admins);
+context.SaveChanges();
 Login login = new Login(context);
 
 

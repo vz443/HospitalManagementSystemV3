@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HospitalManagementSystemV3.App.Interface
+﻿namespace HospitalManagementSystemV3.App.Interface
 {
     public interface IUser
     {

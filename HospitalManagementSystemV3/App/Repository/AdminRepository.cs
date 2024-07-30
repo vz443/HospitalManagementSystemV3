@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace HospitalManagementSystemV3.App.Repository
 {
-    class AdminRepository : Repository<Admin>
+    public class AdminRepository : Repository<Admin>
     {
         public AdminRepository(AppDbContext context) : base(context)
         {
@@ -14,16 +14,6 @@ namespace HospitalManagementSystemV3.App.Repository
         }
 
         AppDbContext _context;
-
-        public void Add(Admin entity)
-        {
-            _context.Admins.Add(entity);
-        }
-
-        public IEnumerable<Admin> Find(Expression<Func<Admin, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
 
         public IEnumerable<Patient> GetAllPatients()
         {
@@ -53,12 +43,12 @@ namespace HospitalManagementSystemV3.App.Repository
 
         public void AddDoctor(Doctor entity)
         {
-
+            _context.Doctors.Add(entity);
         }
 
         public void AddPatient(Patient entity)
         {
-
+            _context.Patients.Add(entity);
         }
 
         public void RemoveAdmin(Admin entity)
@@ -73,7 +63,7 @@ namespace HospitalManagementSystemV3.App.Repository
 
         public void Update(Admin entity)
         {
-            throw new NotImplementedException();
+            _context.Admins.Update(entity);
         }
     }
 }

@@ -209,3 +209,5 @@ namespace HospitalManagementSystemV3.App.Print
 
     }
 }
+
+// cant add new doctor 

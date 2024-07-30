@@ -14,7 +14,7 @@ namespace HospitalManagementSystemV3.App
 
             _doctorRepository = new DoctorRepository(context);
 
-            currentDoctor = loggedInUser;
+            currentDoctor = (Doctor)loggedInUser;
             testContext = context;
             Startup();
         }
@@ -22,7 +22,7 @@ namespace HospitalManagementSystemV3.App
         DoctorRepository _doctorRepository;
 
         AppDbContext testContext;
-        IUser currentDoctor;
+        Doctor currentDoctor;
 
         void Startup()
         {
@@ -81,7 +81,7 @@ namespace HospitalManagementSystemV3.App
                     ListPatients();
                     break;
                 case 3:
-                    ListAppointments();
+                    ListAllAppointments();
                     break;
                 case 4:
                     CheckParticularPatient();
@@ -170,7 +170,15 @@ namespace HospitalManagementSystemV3.App
 
         public void ListAllAppointments()
         {
+            Console.Clear();
+            PrintText.PrintHeader("All Appointments");
+            Console.WriteLine();
 
+            PrintText.Print(_doctorRepository.GetAllAppointmentsForDoctor(currentDoctor).ToArray());
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
 
         public void Logout()

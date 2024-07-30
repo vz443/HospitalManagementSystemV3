@@ -4,22 +4,19 @@ using HospitalManagementSystemV3.App.Print;
 using HospitalManagementSystemV3.App.Repository;
 using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace HospitalManagementSystemV3.App
 {
-    class AdminMenu : PrintText, IMenu
+    class AdminMenu : PrintText,  IMenu
     {
         public AdminMenu(AppDbContext context, IUser loggedInUser)
         {
             _adminRepository = new AdminRepository(context);
 
             _loggedInUser = loggedInUser;
+
+            DisplayMainMenu();
         }
 
         private AdminRepository _adminRepository;
@@ -102,22 +99,26 @@ namespace HospitalManagementSystemV3.App
 
         public void ListAllDoctors()
         {
-            Console.Clear();
-            PrintText.PrintHeader("All Doctors");
-            Console.WriteLine();
-            PrintText.Print(_adminRepository.GetAllDoctors().ToArray()); 
+            Utils.CreateHeader("All Doctors");
+            PrintText.Print(_adminRepository.GetAllDoctors().ToArray());
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
 
         public void CheckDoctorDetails()
         {
-            Console.Clear();
-            PrintText.PrintHeader("Doctor Details");
-            Console.WriteLine();
+            Utils.CreateHeader("Doctor Details");
 
             Console.WriteLine("Please enter the ID of the doctor who's detail you are checking. Or press n to return to menu");
             var userID  = Console.ReadLine();
             Console.WriteLine();
             PrintText.Print(_adminRepository.GetDoctorById(userID));
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
 
         public void ListAllPatients()
@@ -127,6 +128,9 @@ namespace HospitalManagementSystemV3.App
            Console.WriteLine();
            PrintText.Print(_adminRepository.GetAllPatients().ToArray());
 
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
 
         public void CheckPatientDetails()
@@ -139,6 +143,10 @@ namespace HospitalManagementSystemV3.App
             var id = Console.ReadLine();
 
             _adminRepository.GetPatientById(id);
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
 
         public void AddDoctor()
@@ -189,6 +197,10 @@ namespace HospitalManagementSystemV3.App
             };
 
             _adminRepository.AddDoctor(doctor);
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
 
         public void AddPatient()
@@ -233,6 +245,10 @@ namespace HospitalManagementSystemV3.App
             };
 
             _adminRepository.AddPatient(patient);
+
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+            DisplayMainMenu();
         }
     }
 }

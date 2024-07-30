@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace HospitalManagementSystemV3.App.Repository
 {
-    class DoctorRepository : Repository<Doctor>
+    public class DoctorRepository : Repository<Doctor>
     {
         public DoctorRepository(AppDbContext context) : base(context)
         {
@@ -22,6 +22,14 @@ namespace HospitalManagementSystemV3.App.Repository
         {
             return _context.Patients.ToList(); // Retrieve all patients from the database
         }
+
+        public IEnumerable<Appointment> GetAllAppointmentsForDoctor(Doctor entity)
+        {
+            return _context.Appointments
+                           .Where(a => a.DoctorId == entity.Id)
+                           .ToList();
+        }
+
 
         public Patient GetPatientById(string id)
         {

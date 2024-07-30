@@ -8,7 +8,7 @@ namespace HospitalManagementSystemV3.Database
     {
         public AppDbContext()
         {
-            CreateDatabase();
+            CreateDatabase(); 
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -102,21 +102,21 @@ namespace HospitalManagementSystemV3.Database
             modelBuilder.Entity<Appointment>().HasData(
                 new Appointment
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     DoctorId = doctorId1,
                     PatientId = patientId1,
                     Description = "General Checkup"
                 },
                 new Appointment
                 {
-                    Id = 2,
+                    Id = Guid.NewGuid(),
                     DoctorId = doctorId1,
                     PatientId = patientId2,
                     Description = "Follow-up Visit"
                 },
                 new Appointment
                 {
-                    Id = 3,
+                    Id = Guid.NewGuid(),
                     DoctorId = doctorId2,
                     PatientId = patientId3,
                     Description = "Consultation"
@@ -124,9 +124,9 @@ namespace HospitalManagementSystemV3.Database
             );
         }
 
-        public DbSet<Patient> Patients { get; set; }
-        public DbSet<Doctor> Doctors { get; set; }
-        public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<Admin> Admins { get; set; }
+        public virtual DbSet<Patient> Patients { get; set; }
+        public virtual DbSet<Doctor> Doctors { get; set; }
+        public virtual DbSet<Appointment> Appointments { get; set; }
+        public virtual DbSet<Admin> Admins { get; set; }
     }
 }

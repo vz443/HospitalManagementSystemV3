@@ -20,11 +20,13 @@ namespace HospitalManagementSystemV3.App.Repository
         public void UpdatePatient(Patient patient)
         {
             _context.Patients.Update(patient); // Update the patient entity in the context
+            _context.SaveChanges();
         }
 
         public void AddAppointment(Appointment appointment)
         {
             _context.Appointments.Add(appointment); // Add the appointment entity to the context
+            _context.SaveChanges();
         }
 
         public IEnumerable<Appointment> GetAllAppointmentsForPatient(Patient patient)

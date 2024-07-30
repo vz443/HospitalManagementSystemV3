@@ -4,6 +4,7 @@ using HospitalManagementSystemV3.Database;
 using HospitalManagementSystemV3.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Security;
+using System.Windows.Markup;
 
 namespace HospitalManagementSystemV3.App
 {
@@ -112,6 +113,8 @@ namespace HospitalManagementSystemV3.App
 
             var patientList = _context.Patients.ToList();
 
+            var adminList = _context.Admins.ToList();
+
              List<IUser> totalList =new List<IUser>();
 
             foreach (IUser user in patientList)
@@ -122,6 +125,11 @@ namespace HospitalManagementSystemV3.App
             foreach (IUser user in doctorList)
             {
                 totalList.Add(user);
+            }
+
+            foreach (IUser admin in adminList)
+            {
+                totalList.Add(admin);
             }
 
             foreach (var user in totalList)

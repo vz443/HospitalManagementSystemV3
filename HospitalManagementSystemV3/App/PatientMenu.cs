@@ -186,7 +186,6 @@ namespace HospitalManagementSystemV3.App
                     var doctor = doctors[doctorIndex - 1];
                     patient.Doctor = doctor;
                     _patientRepository.Update(patient); // Use repository method to update patient
-                    _patientRepository.SaveChanges(); // Save changes to the database
 
                     Console.WriteLine("You have been successfully registered with the selected doctor.");
                 }
@@ -214,7 +213,6 @@ namespace HospitalManagementSystemV3.App
                 };
 
                 _patientRepository.AddAppointment(appointment); // Use repository method to add appointment
-                _patientRepository.SaveChanges(); // Save changes to the database
 
                 Console.WriteLine("The appointment has been booked successfully.");
             }

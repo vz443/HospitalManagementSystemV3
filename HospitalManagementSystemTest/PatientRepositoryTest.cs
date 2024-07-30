@@ -12,106 +12,147 @@ namespace HospitalManagementSystemTest
 {
     public class PatientRepositoryTest
     {
-        private Mock<DbSet<T>> CreateMockDbSet<T>(IEnumerable<T> elements) where T : class
+        private Mock<AppDbContext>? _mockContext;
+        private PatientRepository? _patientRepository;
+
+        [SetUp]
+        public void Setup()
         {
-            var queryable = elements.AsQueryable();
-            var dbSet = new Mock<DbSet<T>>();
-            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(queryable.GetEnumerator());
-            return dbSet;
+            _mockContext = new Mock<AppDbContext>();
+
+            // Mock DbSet properties
+            var mockPatients = new Mock<DbSet<Patient>>();
+            var mockAppointments = new Mock<DbSet<Appointment>>();
+            var mockDoctors = new Mock<DbSet<Doctor>>();
+
+            _mockContext.Setup(c => c.Patients).Returns(mockPatients.Object);
+            _mockContext.Setup(c => c.Appointments).Returns(mockAppointments.Object);
+            _mockContext.Setup(c => c.Doctors).Returns(mockDoctors.Object);
+
+            // Create repository instance
+            _patientRepository = new PatientRepository(_mockContext.Object);
         }
 
         [Test]
-        public void GetAllDoctors_ReturnsAllDoctors()
+        public void TestGetAllDoctors_Success()
         {
             // Arrange
             var doctors = new List<Doctor>
             {
-                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Alice", Email = "alice@example.com", Phone = "123-456-7890", Address = "123 Main St, Cityville", Username = "alice123", Password = "securepassword1" },
-                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Bob", Email = "bob@example.com", Phone = "234-567-8901", Address = "456 Elm St, Townsville", Username = "bob234", Password = "securepassword2" },
-                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Carol", Email = "carol@example.com", Phone = "345-678-9012", Address = "789 Pine St, Villagetown", Username = "carol345", Password = "securepassword3" },
-                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Dave", Email = "dave@example.com", Phone = "456-789-0123", Address = "101 Maple St, Hamlet", Username = "dave456", Password = "securepassword4" },
-                new Doctor { Id = Guid.NewGuid(), Name = "Dr. Eve", Email = "eve@example.com", Phone = "567-890-1234", Address = "202 Oak St, Metropolis", Username = "eve567", Password = "securepassword5" }
-            };
-            var mockDbSet = CreateMockDbSet(doctors);
-            var mockContext = new Mock<AppDbContext>();
-            mockContext.Setup(c => c.Doctors).Returns(mockDbSet.Object);
-            var repository = new PatientRepository(mockContext.Object);
+                new Doctor { Id = Guid.NewGuid(), Name = "Dr. A", Email = "a@example.com", Phone = "123456", Address = "Address A", Username = "dr.a", Password = "passA" },
+                new Doctor { Id = Guid.NewGuid(), Name = "Dr. B", Email = "b@example.com", Phone = "234567", Address = "Address B", Username = "dr.b", Password = "passB" }
+            }.AsQueryable();
+
+            var mockDoctorsDbSet = new Mock<DbSet<Doctor>>();
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.Provider).Returns(doctors.Provider);
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.Expression).Returns(doctors.Expression);
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.ElementType).Returns(doctors.ElementType);
+            mockDoctorsDbSet.As<IQueryable<Doctor>>().Setup(m => m.GetEnumerator()).Returns(doctors.GetEnumerator());
+
+            _mockContext.Setup(c => c.Doctors).Returns(mockDoctorsDbSet.Object);
 
             // Act
-            var result = repository.GetAllDoctors();
+            var result = _patientRepository.GetAllDoctors();
 
             // Assert
-            Assert.Equals(2, result.Count());
-            Assert.Equals("Dr. A", result.First().Name);
+            Assert.AreEqual(2, result.Count());
         }
 
         [Test]
         public void AddAppointment_AddsAppointment()
         {
             // Arrange
-            var mockDbSet = new Mock<DbSet<Appointment>>();
-            var mockContext = new Mock<AppDbContext>();
-            mockContext.Setup(c => c.Appointments).Returns(mockDbSet.Object);
-            var repository = new PatientRepository(mockContext.Object);
-            var appointment = new Appointment { Id = 234, PatientId = Guid.NewGuid(), DoctorId = Guid.NewGuid(), Description = "Test Appointment" };
+            var appointment = new Appointment
+            {
+                Id = Guid.NewGuid(),
+                PatientId = Guid.NewGuid(),
+                DoctorId = Guid.NewGuid(),
+                Description = "Check-up"
+            };
+
+            var mockAppointmentsDbSet = new Mock<DbSet<Appointment>>();
+            var appointmentData = new List<Appointment>().AsQueryable();
+
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.Provider).Returns(appointmentData.Provider);
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.Expression).Returns(appointmentData.Expression);
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.ElementType).Returns(appointmentData.ElementType);
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.GetEnumerator()).Returns(appointmentData.GetEnumerator());
+
+            _mockContext.Setup(c => c.Appointments).Returns(mockAppointmentsDbSet.Object);
 
             // Act
-            repository.AddAppointment(appointment);
-            repository.SaveChanges();
+            _patientRepository.AddAppointment(appointment);
 
             // Assert
-            mockDbSet.Verify(m => m.Add(It.IsAny<Appointment>()), Times.Once());
-            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+            mockAppointmentsDbSet.Verify(m => m.Add(It.IsAny<Appointment>()), Times.Once());
+            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
         }
+
+
 
         [Test]
         public void UpdatePatient_UpdatesPatient()
         {
             // Arrange
-            var mockDbSet = new Mock<DbSet<Patient>>();
-            var mockContext = new Mock<AppDbContext>();
-            mockContext.Setup(c => c.Patients).Returns(mockDbSet.Object);
-            var repository = new PatientRepository(mockContext.Object);
-            var patient = new Patient { Id = Guid.NewGuid(), Name = "John Doe", Email = "john.doe@example.com", Phone = "123-456-7890", Address = "456 Maple St, Townsville", Username = "johndoe", Password = "securepassword" };
+            var patientId = Guid.NewGuid();
+            var patient = new Patient
+            {
+                Id = patientId,
+                Name = "John Doe",
+                Email = "john.doe@example.com",
+                Phone = "123456",
+                Address = "123 Main St",
+                Username = "johndoe",
+                Password = "password"
+            };
+
+            var mockPatientsDbSet = new Mock<DbSet<Patient>>();
+            var patientData = new List<Patient> { patient }.AsQueryable();
+
+            mockPatientsDbSet.As<IQueryable<Patient>>().Setup(m => m.Provider).Returns(patientData.Provider);
+            mockPatientsDbSet.As<IQueryable<Patient>>().Setup(m => m.Expression).Returns(patientData.Expression);
+            mockPatientsDbSet.As<IQueryable<Patient>>().Setup(m => m.ElementType).Returns(patientData.ElementType);
+            mockPatientsDbSet.As<IQueryable<Patient>>().Setup(m => m.GetEnumerator()).Returns(patientData.GetEnumerator());
+
+            _mockContext.Setup(c => c.Patients).Returns(mockPatientsDbSet.Object);
+            _mockContext.Setup(c => c.SaveChanges()).Verifiable();
+
             // Act
-            repository.UpdatePatient(patient);
-            repository.SaveChanges();
+            patient.Name = "John Updated";
+            _patientRepository.UpdatePatient(patient);
 
             // Assert
-            mockDbSet.Verify(m => m.Update(It.IsAny<Patient>()), Times.Once());
-            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+            mockPatientsDbSet.Verify(m => m.Update(It.IsAny<Patient>()), Times.Once());
+            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
         }
+
 
         [Test]
         public void GetAllAppointmentsForPatient_ReturnsAppointments()
         {
             // Arrange
-            var patientId = Guid.NewGuid();
-            var patient = new Patient { Id = patientId, Name = "John Doe", Email = "john.doe@example.com", Phone = "123-456-7890", Address = "456 Maple St, Townsville", Username = "johndoe", Password = "securepassword" };
-
-            var doctor1 = new Doctor { Id = Guid.NewGuid(), Name = "Dr. Smith", Email = "dr.smith@example.com", Phone = "111-222-3333", Address = "123 Elm St, Townsville", Username = "username", Password = "password" };
-            var doctor2 = new Doctor { Id = Guid.NewGuid(), Name = "Dr. Johnson", Email = "dr.johnson@example.com", Phone = "444-555-6666", Address = "789 Pine St, Townsville", Username = "username", Password = "password"};
-
+            var patient = new Patient { Id = Guid.NewGuid(), Name = "Dr. B", Email = "b@example.com", Phone = "234567", Address = "Address B", Username = "dr.b", Password = "passB" };
             var appointments = new List<Appointment>
             {
-                new Appointment { Id = 222, PatientId = patientId, DoctorId = doctor1.Id, Doctor = doctor1, Description = "Checkup" },
-                new Appointment { Id = 223, PatientId = patientId, DoctorId = doctor2.Id, Doctor = doctor2, Description = "Follow-up" }
-            };
+                new Appointment { Id = Guid.NewGuid(), PatientId = patient.Id, DoctorId = Guid.NewGuid(), Description = "Check-up"},
+                new Appointment { Id = Guid.NewGuid(), PatientId = patient.Id, DoctorId = Guid.NewGuid(), Description = "Follow-up"}
+            }.AsQueryable();
 
-            var mockAppointmentDbSet = CreateMockDbSet(appointments);
-            var mockContext = new Mock<AppDbContext>();
-            mockContext.Setup(c => c.Appointments).Returns(mockAppointmentDbSet.Object);
+            var mockAppointmentsDbSet = new Mock<DbSet<Appointment>>();
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.Provider).Returns(appointments.Provider);
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.Expression).Returns(appointments.Expression);
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.ElementType).Returns(appointments.ElementType);
+            mockAppointmentsDbSet.As<IQueryable<Appointment>>().Setup(m => m.GetEnumerator()).Returns(appointments.GetEnumerator());
 
-            var repository = new PatientRepository(mockContext.Object);
+            _mockContext.Setup(c => c.Appointments).Returns(mockAppointmentsDbSet.Object);
 
             // Act
-            var result = repository.GetAllAppointmentsForPatient(patient);
+            var result = _patientRepository.GetAllAppointmentsForPatient(patient);
 
             // Assert
-            Assert.Equals(2, result.Count());
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.All(a => a.PatientId == patient.Id));
         }
+
     }
 }
